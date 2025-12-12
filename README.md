@@ -8,7 +8,7 @@
 
 # dingoPDM_FW
 
-dingoPDM is an Infineon Profet based Power Distribution Module. My version has been customised to have more outputs with lesser current carrying capability, ideal for use in motorcycles, snowcats, boats etc.
+dingoPDM is an Infineon Profet based Power Distribution Module. 
 
 # [**Documentation**](https://corygrant.github.io/dingoPDM/)
 

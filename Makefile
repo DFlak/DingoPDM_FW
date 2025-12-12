@@ -4,8 +4,9 @@
 #
 
 ifeq ($(BOARD),)
-	BOARD = dingopdm_v7
+	BOARD = dingopdm_v7_df
 	#BOARD = dingopdmmax_v1
+	#BOARD = dingopdm_v7
 endif
 
 $(info BOARD is set to: $(BOARD))
