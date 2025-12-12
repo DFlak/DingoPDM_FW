@@ -3,10 +3,13 @@
         {
             "name": "STM32-ChibiOS",
             //Windows
-            "compilerPath": "C:/arm-gnu-toolchain-13.3.rel1-mingw-w64-i686-arm-none-eabi/bin/arm-none-eabi-gcc.exe",
+            "compilerPath": "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/14.3 rel1/bin/arm-none-eabi-gcc.exe",
             //Linux
             //"compilerPath": "/opt/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
             "cStandard": "c17",
+            "defines":[
+                "PDM_TYPE=2"
+            ],
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-arm",
             "includePath": [
@@ -49,6 +52,7 @@
                 "${workspaceFolder}/hardware",
                 "${workspaceFolder}/wiper",
                 "${workspaceFolder}/boards/dingopdm_v7",
+                "${workspaceFolder}/boards/dingopdm_v7_df",
                 "${workspaceFolder}/boards/dingopdmmax_v1",
                 "${workspaceFolder}/boards/cortex-m4",
                 "${workspaceFolder}"

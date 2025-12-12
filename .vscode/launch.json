@@ -1,10 +1,27 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
         {
             "cwd": "${workspaceFolder}",
             "executable": "${workspaceFolder}/build/dingopdm_v7.elf",
             "name": "Debug dingoPDM v7",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "configFiles": ["interface/stlink.cfg", 
+						    "target/stm32f4x.cfg"],
+            "showDevDebugOutput": "raw",
+            "svdFile": "${workspaceFolder}STM32F446.svd",
+            "rtos": "auto",
+            "v1": false,
+            "runToEntryPoint": "main",
+
+        },
+          {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/dingopdm_v7_df.elf",
+            "name": "Debug dingoPDM v7df",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
