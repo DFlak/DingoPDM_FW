@@ -8,7 +8,7 @@
             //"compilerPath": "/opt/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
             "cStandard": "c17",
             "defines":[
-                "PDM_TYPE=2"
+                "PDM_TYPE=0"
             ],
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-arm",

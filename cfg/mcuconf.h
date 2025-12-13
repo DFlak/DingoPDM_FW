@@ -245,13 +245,14 @@
 #define STM32_PWM_USE_TIM3                  TRUE
 #define STM32_PWM_USE_TIM4                  TRUE
 #define STM32_PWM_USE_TIM5                  TRUE
-#define STM32_PWM_USE_TIM8                  FALSE
+#define STM32_PWM_USE_TIM8                  TRUE
 #define STM32_PWM_USE_TIM9                  TRUE
 #define STM32_PWM_USE_TIM10                 TRUE
 #define STM32_PWM_USE_TIM11                 TRUE
 #define STM32_PWM_USE_TIM12                 TRUE
 #define STM32_PWM_USE_TIM13                 TRUE
-#define STM32_PWM_USE_TIM14                 FALSE
+#define STM32_PWM_USE_TIM14                 TRUE
+
 
 /*
  * RTC driver system settings.

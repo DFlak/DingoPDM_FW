@@ -69,10 +69,10 @@ adcsample_t adc1_samples[ADC1_NUM_CHANNELS] = {0};
 
 // new
 // 0 = OutIS1_2 - ADC1_IN7
-// 1 = OutIS9_10 - ADC1_IN12
-// 2 = OutIS3_4 - ADC1_IN13
-// 3 = OutIS5_6 - ADC1_IN1
-// 4 = OutIS7_8 - ADC1_IN2
+// 1 = OutIS3_4 - ADC1_IN13
+// 2 = OutIS5_6 - ADC1_IN1
+// 3 = OutIS7_8 - ADC1_IN2
+// 4 = OutIS9_10 - ADC1_IN12
 // 5 = BattVolt - ADC1_IN3
 // 6 = TempSensor
 // 7 = VRefInt
@@ -98,12 +98,11 @@ static const ADCConversionGroup adc1_cfg = {
     .sqr2 = ADC_SQR2_SQ7_N(ADC_CHANNEL_SENSOR) |
             ADC_SQR2_SQ8_N(ADC_CHANNEL_VREFINT),
     .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN7) |
-            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN12) |
-            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN13) |
-            ADC_SQR3_SQ4_N(ADC_CHANNEL_IN1) |
-            ADC_SQR3_SQ5_N(ADC_CHANNEL_IN2) |
+            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN13) |
+            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN1) |
+            ADC_SQR3_SQ4_N(ADC_CHANNEL_IN2) |
+            ADC_SQR3_SQ5_N(ADC_CHANNEL_IN12) |
             ADC_SQR3_SQ6_N(ADC_CHANNEL_IN3)};
-
 msg_t InitAdc()
 {
     msg_t ret;
@@ -113,21 +112,10 @@ msg_t InitAdc()
 
     adcSTM32EnableTSVREFE(); // Enable temp sensor and vref
 
-    // Initialize buffer to zero
-    for (int i = 0; i < ADC1_NUM_CHANNELS; i++)
-    {
-        adc1_samples[i] = 0;
-    }
-
     // Need to continuous conversion to read both channels of the BTS7008-2EPA
     // Requires 2 channels to be read with a 100us delay between them
     // Profet DSEL pin toggled in profet.cpp
     adcStartConversion(&ADCD1, &adc1_cfg, adc1_samples, ADC1_BUF_DEPTH);
-
-    // Wait for first conversion cycle to complete
-    // With 8 channels at 15 cycles sampling time, first conversion takes ~200us
-    // Add extra margin for ADC settling
-    chThdSleepMicroseconds(500);
 
     return HAL_RET_SUCCESS;
 }
@@ -140,19 +128,7 @@ void DeInitAdc()
 
 uint16_t GetAdcRaw(AnalogChannel channel)
 {
-    // Map AnalogChannel enum to correct ADC sequence indices
-    // ADC sequence: IS1_2, IS9_10, IS3_4, IS5_6, IS7_8, BattVolt, TempSensor, VRefInt
-    static const uint8_t channel_map[] = {
-        0, // IS1_2 -> adc1_samples[0]
-        2, // IS3_4 -> adc1_samples[2]
-        3, // IS5_6 -> adc1_samples[3]
-        4, // IS7_8 -> adc1_samples[4]
-        1, // IS9_10 -> adc1_samples[1]
-        5, // BattVolt -> adc1_samples[5]
-        6, // TempSensor -> adc1_samples[6]
-        7  // VRefInt -> adc1_samples[7]
-    };
-    return adc1_samples[channel_map[static_cast<uint8_t>(channel)]];
+    return adc1_samples[static_cast<uint8_t>(channel)];
 }
 
 float GetBattVolt()

@@ -1,7 +1,7 @@
 #include "hw_devices.h"
 #include "port_pwm.h"
 
-#if PDM_TYPE == 2
+#if PDM_TYPE == 0
 Profet pf[PDM_NUM_OUTPUTS] = {
     Profet(1, ProfetModel::BTS7008_2EPA_CH1, LINE_PF1_IN, LINE_PF1_2_DEN, LINE_PF1_2_DSEL, AnalogChannel::IS1_2, &PWMD3, &pwm3Cfg, PwmChannel::Ch1),
     Profet(2, ProfetModel::BTS7008_2EPA_CH2, LINE_PF2_IN, LINE_PF1_2_DEN, LINE_PF1_2_DSEL, AnalogChannel::IS1_2, &PWMD4, &pwm4Cfg, PwmChannel::Ch1),
@@ -11,8 +11,8 @@ Profet pf[PDM_NUM_OUTPUTS] = {
     Profet(6, ProfetModel::BTS7008_2EPA_CH2, LINE_PF6_IN, LINE_PF5_6_DEN, LINE_PF5_6_DSEL, AnalogChannel::IS5_6, &PWMD11, &pwm11Cfg, PwmChannel::Ch1),
     Profet(7, ProfetModel::BTS7008_2EPA_CH1, LINE_PF7_IN, LINE_PF7_8_DEN, LINE_PF7_8_DSEL, AnalogChannel::IS7_8, &PWMD12, &pwm12Cfg, PwmChannel::Ch1),
     Profet(8, ProfetModel::BTS7008_2EPA_CH2, LINE_PF8_IN, LINE_PF7_8_DEN, LINE_PF7_8_DSEL, AnalogChannel::IS7_8, &PWMD13, &pwm13Cfg, PwmChannel::Ch1),
-    Profet(9, ProfetModel::BTS7008_2EPA_CH2, LINE_PF9_IN, LINE_PF9_10_DEN, LINE_PF9_10_DSEL, AnalogChannel::IS9_10, &PWMD13, &pwm14Cfg, PwmChannel::Ch1),
-    Profet(10, ProfetModel::BTS7008_2EPA_CH2, LINE_PF10_IN, LINE_PF9_10_DEN, LINE_PF9_10_DSEL, AnalogChannel::IS9_10, &PWMD13, &pwm15Cfg, PwmChannel::Ch1)};
+    Profet(9, ProfetModel::BTS7008_2EPA_CH1, LINE_PF9_IN, LINE_PF9_10_DEN, LINE_PF9_10_DSEL, AnalogChannel::IS9_10, &PWMD14, &pwm14Cfg, PwmChannel::Ch1),
+    Profet(10, ProfetModel::BTS7008_2EPA_CH2, LINE_PF10_IN, LINE_PF9_10_DEN, LINE_PF9_10_DSEL, AnalogChannel::IS9_10, &PWMD8, &pwm8Cfg, PwmChannel::Ch1)};
 
 Digital in[PDM_NUM_INPUTS] = {
     Digital(LINE_DI1),

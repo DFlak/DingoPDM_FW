@@ -4,6 +4,7 @@ BOARDSRC = ./boards/dingopdm_v7_df/board.c
 # Required include directories
 BOARDINC = ./boards/dingopdm_v7_df
 
+
 # Shared variables
 ALLCSRC += $(BOARDSRC)
 ALLINC  += $(BOARDINC)

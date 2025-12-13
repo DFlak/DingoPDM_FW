@@ -275,7 +275,7 @@ static const PWMConfig pwm14Cfg = {
     .bdtr = 0,
     .dier = 0
 };
-static const PWMConfig pwm15Cfg = {
+static const PWMConfig pwm8Cfg = {
     .frequency = 1000000,
     .period = 10000,
     .callback = pwmOut10pcb,

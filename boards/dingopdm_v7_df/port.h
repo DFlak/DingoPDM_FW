@@ -3,7 +3,7 @@
 #include "hal.h"
 #include "enums.h"
 
-#define PDM_TYPE 2 //0 = PDM, 1 = PDM-MAX, 2 = PDM_DF
+#define PDM_TYPE 0 //0 = PDM, 1 = PDM-MAX, 2 = PDM_DF, stays 0 for now since configurator is not ready for anything other than 0 or 1
 
 #define PDM_NUM_OUTPUTS 10
 #define PDM_NUM_INPUTS 2
