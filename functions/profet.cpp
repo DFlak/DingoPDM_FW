@@ -200,7 +200,7 @@ void Profet::Update(bool bOutEnabled)
     palClearLine(LINE_E2);
 }
 
-MsgCmdResult Profet::ProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx)
+MsgCmdResult OutputsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx)
 {
     // DLC 8 = Set output settings
     // DLC 2 = Get output settings
@@ -244,6 +244,52 @@ MsgCmdResult Profet::ProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFr
         }
         return MsgCmdResult::Invalid;
     }
+    return MsgCmdResult::Invalid;
+}
+
+MsgCmdResult OutputsInrushMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx)
+{
+    // DLC 3 = Set output inrush time
+    // DLC 2 = Get output inrush time
+
+    if ((rx->DLC == 3) || (rx->DLC == 2))
+    {
+        uint8_t nIndex = Dbc::DecodeInt(rx->data8, 12, 4);
+        if (nIndex < PDM_NUM_OUTPUTS)
+        {
+            if (rx->DLC == 3)
+            {
+                conf->stOutput[nIndex].nInrushTime = Dbc::DecodeInt(rx->data8, 16, 8, 100.0f);
+            }
+
+            tx->DLC = 3;
+            tx->IDE = CAN_IDE_STD;
+
+            for (int i = 0; i < 8; i++) tx->data8[i] = 0;
+
+            Dbc::EncodeInt(tx->data8, static_cast<uint8_t>(MsgCmd::OutputsInrush) + 128, 0, 8);
+            Dbc::EncodeInt(tx->data8, nIndex, 12, 4);
+            Dbc::EncodeInt(tx->data8, conf->stOutput[nIndex].nInrushTime, 16, 8, 100.0f);
+
+            if (rx->DLC == 3)
+                return MsgCmdResult::Write;
+            else
+                return MsgCmdResult::Request;
+        }
+        return MsgCmdResult::Invalid;
+    }
+    return MsgCmdResult::Invalid;
+}
+
+MsgCmdResult Profet::ProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx)
+{
+    MsgCmd cmd = static_cast<MsgCmd>(rx->data8[0]);
+
+    if (cmd == MsgCmd::Outputs)
+        return OutputsMsg(conf, rx, tx);
+    else if (cmd == MsgCmd::OutputsInrush)
+        return OutputsInrushMsg(conf, rx, tx);
+
     return MsgCmdResult::Invalid;
 }
 

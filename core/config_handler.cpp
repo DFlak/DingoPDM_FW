@@ -35,9 +35,11 @@ MsgCmd ConfigHandler(CANRxFrame *frame)
             res = Digital::ProcessSettingsMsg(&stConfig, frame, &tx);
             break;
         case MsgCmd::Outputs:
+        case MsgCmd::OutputsInrush:
             res = Profet::ProcessSettingsMsg(&stConfig, frame, &tx);
             break;
         case MsgCmd::OutputsPwm:
+        case MsgCmd::OutputsPwmDenom:
             res = Pwm::ProcessSettingsMsg(&stConfig, frame, &tx);
             break;
         case MsgCmd::CanInputs:
@@ -53,6 +55,8 @@ MsgCmd ConfigHandler(CANRxFrame *frame)
         case MsgCmd::Wiper:
         case MsgCmd::WiperSpeed:
         case MsgCmd::WiperDelays:
+        case MsgCmd::WiperInputs:
+        case MsgCmd::WiperInputs2:
             res = Wiper::ProcessSettingsMsg(&stConfig, frame, &tx);
             break;
         case MsgCmd::Flashers:
@@ -74,6 +78,8 @@ MsgCmd ConfigHandler(CANRxFrame *frame)
         case MsgCmd::KeypadButton:
         case MsgCmd::KeypadButtonLed:
         case MsgCmd::KeypadDial:
+        case MsgCmd::KeypadButtonVars:
+        case MsgCmd::KeypadButtonVars2:
             res = Keypad::ProcessSettingsMsg(&stConfig, frame, &tx);
             break;
         default:

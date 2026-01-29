@@ -80,6 +80,7 @@ MsgCmdResult VirtualInputMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx)
                 conf->stVirtualInput[nIndex].bNot2 = Dbc::DecodeInt(rx->data8, 19, 1);
                 conf->stVirtualInput[nIndex].eCond0 = static_cast<BoolOperator>(Dbc::DecodeInt(rx->data8, 20, 2));
                 conf->stVirtualInput[nIndex].eCond1 = static_cast<BoolOperator>(Dbc::DecodeInt(rx->data8, 22, 2));
+                conf->stVirtualInput[nIndex].eMode = static_cast<InputMode>(Dbc::DecodeInt(rx->data8, 24, 2));
             }
 
             tx->DLC = 3;
@@ -96,6 +97,7 @@ MsgCmdResult VirtualInputMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx)
             Dbc::EncodeInt(tx->data8, conf->stVirtualInput[nIndex].bNot2, 19, 1);
             Dbc::EncodeInt(tx->data8, static_cast<uint8_t>(conf->stVirtualInput[nIndex].eCond0), 20, 2);
             Dbc::EncodeInt(tx->data8, static_cast<uint8_t>(conf->stVirtualInput[nIndex].eCond1), 22, 2);
+            Dbc::EncodeInt(tx->data8, static_cast<uint8_t>(conf->stVirtualInput[nIndex].eMode), 24, 2);
 
             if (rx->DLC == 3)
                 return MsgCmdResult::Write;

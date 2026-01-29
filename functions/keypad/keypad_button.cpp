@@ -60,30 +60,23 @@ void KeypadButton::UpdateLed()
 
 MsgCmdResult ButtonMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx)
 {
-    // DLC 8 = Set keypad button settings
+    // DLC 3 = Set keypad button settings
     // DLC 2 = Get keypad button settings
 
-    if ((rx->DLC == 8) ||
-        (rx->DLC == 2))
+    if ((rx->DLC == 3) || (rx->DLC == 2))
     {
         uint8_t nIndex = Dbc::DecodeInt(rx->data8, 8, 3);
         uint8_t nButtonIndex = Dbc::DecodeInt(rx->data8, 11, 5);
 
         if (nIndex < PDM_NUM_KEYPADS)
         {
-            if (rx->DLC == 8)
+            if (rx->DLC == 3)
             {
                 conf->stKeypad[nIndex].stButton[nButtonIndex].bEnabled = Dbc::DecodeInt(rx->data8, 16, 1);
                 conf->stKeypad[nIndex].stButton[nButtonIndex].eMode = static_cast<InputMode>(Dbc::DecodeInt(rx->data8, 18, 2));
-
-                conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[0] = Dbc::DecodeInt(rx->data8, 24, 8);
-                conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[1] = Dbc::DecodeInt(rx->data8, 32, 8);
-                conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[2] = Dbc::DecodeInt(rx->data8, 40, 8);
-                conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[3] = Dbc::DecodeInt(rx->data8, 48, 8);
-                conf->stKeypad[nIndex].stButton[nButtonIndex].nFaultVar = Dbc::DecodeInt(rx->data8, 56, 8);
             }
 
-            tx->DLC = 8;
+            tx->DLC = 3;
             tx->IDE = CAN_IDE_STD;
             for (int i = 0; i < 8; i++) tx->data8[i] = 0;
             tx->data8[0] = static_cast<uint8_t>(MsgCmd::KeypadButton) + 128;
@@ -93,13 +86,89 @@ MsgCmdResult ButtonMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx)
             Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].bEnabled, 16, 1);
             Dbc::EncodeInt(tx->data8, static_cast<uint8_t>(conf->stKeypad[nIndex].stButton[nButtonIndex].eMode), 18, 2);
 
-            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[0], 24, 8);
-            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[1], 32, 8);
-            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[2], 40, 8);
-            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[3], 48, 8);
-            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nFaultVar, 56, 8);
+            if (rx->DLC == 3)
+                return MsgCmdResult::Write;
+            else
+                return MsgCmdResult::Request;
+        }
 
-            if(rx->DLC == 8)
+        return MsgCmdResult::Invalid;
+    }
+
+    return MsgCmdResult::Invalid;
+}
+
+MsgCmdResult ButtonVarsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx)
+{
+    // DLC 8 = Set keypad button var indices (nValVars[0-2])
+    // DLC 2 = Get keypad button var indices
+
+    if ((rx->DLC == 8) || (rx->DLC == 2))
+    {
+        uint8_t nIndex = Dbc::DecodeInt(rx->data8, 8, 3);
+        uint8_t nButtonIndex = Dbc::DecodeInt(rx->data8, 11, 5);
+
+        if (nIndex < PDM_NUM_KEYPADS)
+        {
+            if (rx->DLC == 8)
+            {
+                conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[0] = Dbc::DecodeInt(rx->data8, 16, 16);
+                conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[1] = Dbc::DecodeInt(rx->data8, 32, 16);
+                conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[2] = Dbc::DecodeInt(rx->data8, 48, 16);
+            }
+
+            tx->DLC = 8;
+            tx->IDE = CAN_IDE_STD;
+            for (int i = 0; i < 8; i++) tx->data8[i] = 0;
+            tx->data8[0] = static_cast<uint8_t>(MsgCmd::KeypadButtonVars) + 128;
+            Dbc::EncodeInt(tx->data8, nIndex, 8, 3);
+            Dbc::EncodeInt(tx->data8, nButtonIndex, 11, 5);
+
+            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[0], 16, 16);
+            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[1], 32, 16);
+            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[2], 48, 16);
+
+            if (rx->DLC == 8)
+                return MsgCmdResult::Write;
+            else
+                return MsgCmdResult::Request;
+        }
+
+        return MsgCmdResult::Invalid;
+    }
+
+    return MsgCmdResult::Invalid;
+}
+
+MsgCmdResult ButtonVars2Msg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx)
+{
+    // DLC 5 = Set keypad button var indices (nValVars[3], nFaultVar)
+    // DLC 2 = Get keypad button var indices
+
+    if ((rx->DLC == 5) || (rx->DLC == 2))
+    {
+        uint8_t nIndex = Dbc::DecodeInt(rx->data8, 8, 3);
+        uint8_t nButtonIndex = Dbc::DecodeInt(rx->data8, 11, 5);
+
+        if (nIndex < PDM_NUM_KEYPADS)
+        {
+            if (rx->DLC == 5)
+            {
+                conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[3] = Dbc::DecodeInt(rx->data8, 16, 16);
+                conf->stKeypad[nIndex].stButton[nButtonIndex].nFaultVar = Dbc::DecodeInt(rx->data8, 32, 16);
+            }
+
+            tx->DLC = 5;
+            tx->IDE = CAN_IDE_STD;
+            for (int i = 0; i < 8; i++) tx->data8[i] = 0;
+            tx->data8[0] = static_cast<uint8_t>(MsgCmd::KeypadButtonVars2) + 128;
+            Dbc::EncodeInt(tx->data8, nIndex, 8, 3);
+            Dbc::EncodeInt(tx->data8, nButtonIndex, 11, 5);
+
+            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nValVars[3], 16, 16);
+            Dbc::EncodeInt(tx->data8, conf->stKeypad[nIndex].stButton[nButtonIndex].nFaultVar, 32, 16);
+
+            if (rx->DLC == 5)
                 return MsgCmdResult::Write;
             else
                 return MsgCmdResult::Request;
@@ -185,9 +254,13 @@ MsgCmdResult KeypadButton::ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, C
 {
     MsgCmd cmd = static_cast<MsgCmd>(rx->data8[0]);
 
-    if(cmd == MsgCmd::KeypadButton)
+    if (cmd == MsgCmd::KeypadButton)
         return ButtonMsg(conf, rx, tx);
-    else if(cmd == MsgCmd::KeypadButtonLed)
+    else if (cmd == MsgCmd::KeypadButtonVars)
+        return ButtonVarsMsg(conf, rx, tx);
+    else if (cmd == MsgCmd::KeypadButtonVars2)
+        return ButtonVars2Msg(conf, rx, tx);
+    else if (cmd == MsgCmd::KeypadButtonLed)
         return ButtonLedMsg(conf, rx, tx);
     return MsgCmdResult::Invalid;
 }

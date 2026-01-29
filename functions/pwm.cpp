@@ -101,7 +101,7 @@ void Pwm::Off()
     pwmDisableChannel(m_pwm, static_cast<uint8_t>(m_pwmCh));
 }
 
-MsgCmdResult Pwm::ProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx)
+MsgCmdResult OutputsPwmMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx)
 {
     // DLC 8 = Set output pwm settings
     // DLC 2 = Get output pwm settings
@@ -145,6 +145,52 @@ MsgCmdResult Pwm::ProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame
         }
         return MsgCmdResult::Invalid;
     }
+    return MsgCmdResult::Invalid;
+}
+
+MsgCmdResult OutputsPwmDenomMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx)
+{
+    // DLC 4 = Set output PWM duty cycle input denominator
+    // DLC 2 = Get output PWM duty cycle input denominator
+
+    if ((rx->DLC == 4) || (rx->DLC == 2))
+    {
+        uint8_t nIndex = Dbc::DecodeInt(rx->data8, 12, 4);
+        if (nIndex < PDM_NUM_OUTPUTS)
+        {
+            if (rx->DLC == 4)
+            {
+                conf->stOutput[nIndex].stPwm.nDutyCycleInputDenom = Dbc::DecodeInt(rx->data8, 16, 16);
+            }
+
+            tx->DLC = 4;
+            tx->IDE = CAN_IDE_STD;
+
+            for (int i = 0; i < 8; i++) tx->data8[i] = 0;
+
+            Dbc::EncodeInt(tx->data8, static_cast<uint8_t>(MsgCmd::OutputsPwmDenom) + 128, 0, 8);
+            Dbc::EncodeInt(tx->data8, nIndex, 12, 4);
+            Dbc::EncodeInt(tx->data8, conf->stOutput[nIndex].stPwm.nDutyCycleInputDenom, 16, 16);
+
+            if (rx->DLC == 4)
+                return MsgCmdResult::Write;
+            else
+                return MsgCmdResult::Request;
+        }
+        return MsgCmdResult::Invalid;
+    }
+    return MsgCmdResult::Invalid;
+}
+
+MsgCmdResult Pwm::ProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx)
+{
+    MsgCmd cmd = static_cast<MsgCmd>(rx->data8[0]);
+
+    if (cmd == MsgCmd::OutputsPwm)
+        return OutputsPwmMsg(conf, rx, tx);
+    else if (cmd == MsgCmd::OutputsPwmDenom)
+        return OutputsPwmDenomMsg(conf, rx, tx);
+
     return MsgCmdResult::Invalid;
 }
 
