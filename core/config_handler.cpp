@@ -13,91 +13,7 @@
 #include "wiper/wiper.h"
 #include "keypad/keypad.h"
 
-MsgCmd ConfigHandler(CANRxFrame *frame)
-{
-    CANTxFrame tx;
-    MsgCmd cmd;
-    MsgCmdResult res = MsgCmdResult::Invalid;
-
-    if (frame->SID != stConfig.stCanOutput.nBaseId - 1)
-    {
-        return MsgCmd::Null;
-    }
-
-    cmd = static_cast<MsgCmd>(frame->data8[0]);
-
-    switch(cmd)
-    {
-        case MsgCmd::Can:
-            res = CanProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::Inputs:
-            res = Digital::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::Outputs:
-        case MsgCmd::OutputsInrush:
-            res = Profet::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::OutputsPwm:
-        case MsgCmd::OutputsPwmDenom:
-            res = Pwm::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::CanInputs:
-        case MsgCmd::CanInputsId:
-        case MsgCmd::CanInputsOffset:
-        case MsgCmd::CanInputsOperand:
-            res = CanInput::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::VirtualInputs:
-        case MsgCmd::VirtualInputsVars:
-            res = VirtualInput::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::Wiper:
-        case MsgCmd::WiperSpeed:
-        case MsgCmd::WiperDelays:
-        case MsgCmd::WiperInputs:
-        case MsgCmd::WiperInputs2:
-            res = Wiper::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::Flashers:
-            res = Flasher::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::StarterDisable:
-            res = Starter::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::Counters:
-        case MsgCmd::CountersInputs:
-            res = Counter::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::Conditions:
-        case MsgCmd::ConditionsArg:
-            res = Condition::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        case MsgCmd::Keypad:
-        case MsgCmd::KeypadLed:
-        case MsgCmd::KeypadButton:
-        case MsgCmd::KeypadButtonLed:
-        case MsgCmd::KeypadDial:
-        case MsgCmd::KeypadButtonVars:
-        case MsgCmd::KeypadButtonVars2:
-            res = Keypad::ProcessSettingsMsg(&stConfig, frame, &tx);
-            break;
-        default:
-            break;
-    }
-
-    if (res != MsgCmdResult::Invalid)
-    {
-        tx.SID = stConfig.stCanOutput.nBaseId + TX_SETTINGS_ID_OFFSET;
-        PostTxFrame(&tx);
-        //If MsgCmdResult::Request return Null to avoid applying new settings
-        return (res == MsgCmdResult::Write) ? cmd : MsgCmd::Null;
-    }
-    return MsgCmd::Null;
-}
-
 extern PdmConfig stConfig;
-extern float *pVarMap[PDM_VAR_MAP_SIZE];
 extern Digital in[PDM_NUM_INPUTS];
 extern CanInput canIn[PDM_NUM_CAN_INPUTS];
 extern VirtualInput virtIn[PDM_NUM_VIRT_INPUTS];
@@ -111,20 +27,22 @@ extern Keypad keypad[PDM_NUM_KEYPADS];
 
 void ApplyAllConfig()
 {
-    ApplyConfig(MsgCmd::Inputs);
-    ApplyConfig(MsgCmd::CanInputs);
-    ApplyConfig(MsgCmd::VirtualInputs);
-    ApplyConfig(MsgCmd::Outputs);
-    ApplyConfig(MsgCmd::Wiper);
-    ApplyConfig(MsgCmd::StarterDisable);
-    ApplyConfig(MsgCmd::Flashers);
-    ApplyConfig(MsgCmd::Counters);
-    ApplyConfig(MsgCmd::Conditions);
-    ApplyConfig(MsgCmd::Keypad);
+    ApplyConfig(Digital::nBaseIndex);
+    ApplyConfig(CanInput::nBaseIndex);
+    ApplyConfig(VirtualInput::nBaseIndex);
+    ApplyConfig(Profet::nBaseIndex);
+    ApplyConfig(Wiper::nBaseIndex);
+    ApplyConfig(Starter::nBaseIndex);
+    ApplyConfig(Flasher::nBaseIndex);
+    ApplyConfig(Counter::nBaseIndex);
+    ApplyConfig(Condition::nBaseIndex);
+    ApplyConfig(Keypad::nBaseIndex);
 }
 
-void ApplyConfig(MsgCmd eCmd)
-{
+void ApplyConfig(uint16_t nIndex)
+{ 
+    uint16_t nBaseIndex = nIndex & 0xFF00;
+
     if (eCmd == MsgCmd::Can)
     {
         // TODO: Change CAN speed and filters without requiring reset
@@ -132,13 +50,13 @@ void ApplyConfig(MsgCmd eCmd)
         SetCanFilterEnabled(stConfig.stDevConfig.bCanFilterEnabled);
     }
 
-    if (eCmd == MsgCmd::Inputs)
+    if (nBaseIndex == Digital::nBaseIndex)
     {
         for (uint8_t i = 0; i < PDM_NUM_INPUTS; i++)
             in[i].SetConfig(&stConfig.stInput[i]);
     }
 
-    if ((eCmd == MsgCmd::CanInputs) || (eCmd == MsgCmd::CanInputsId))
+    if (nBaseIndex == CanInput::nBaseIndex)
     {
         ClearCanFilters(); // Clear all filters before setting new ones
 
@@ -164,48 +82,47 @@ void ApplyConfig(MsgCmd eCmd)
         //TODO: Set can filter without requiring reset, need a new message to indicate all IDs set before stopping CAN
     }
 
-    if (eCmd == MsgCmd::VirtualInputs)
+    if (nBaseIndex == VirtualInput::nBaseIndex)
     {
         for (uint8_t i = 0; i < PDM_NUM_VIRT_INPUTS; i++)
             virtIn[i].SetConfig(&stConfig.stVirtualInput[i]);
     }
 
-    if (eCmd == MsgCmd::Outputs)
+    if (nBaseIndex == Profet::nBaseIndex)
     {
         for (uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
             pf[i].SetConfig(&stConfig.stOutput[i]);
     }
 
-    if ((eCmd == MsgCmd::Wiper) || (eCmd == MsgCmd::WiperSpeed) || (eCmd == MsgCmd::WiperDelays))
+    if (nBaseIndex == Wiper::nBaseIndex)
     {
         wiper.SetConfig(&stConfig.stWiper);
     }
 
-    if (eCmd == MsgCmd::StarterDisable)
+    if (nBaseIndex == Starter::nBaseIndex)
     {
         starter.SetConfig(&stConfig.stStarter);
     }
 
-    if (eCmd == MsgCmd::Flashers)
+    if (nBaseIndex == Flasher::nBaseIndex)
     {
         for (uint8_t i = 0; i < PDM_NUM_FLASHERS; i++)
             flasher[i].SetConfig(&stConfig.stFlasher[i]);
     }
 
-    if (eCmd == MsgCmd::Counters)
+    if (nBaseIndex == Counter::nBaseIndex)
     {
         for (uint8_t i = 0; i < PDM_NUM_COUNTERS; i++)
             counter[i].SetConfig(&stConfig.stCounter[i]);
     }
 
-    if (eCmd == MsgCmd::Conditions)
+    if (nBaseIndex == Condition::nBaseIndex)
     {
         for (uint8_t i = 0; i < PDM_NUM_CONDITIONS; i++)
             condition[i].SetConfig(&stConfig.stCondition[i]);
     }
 
-    if ((eCmd == MsgCmd::Keypad) || (eCmd == MsgCmd::KeypadLed) || (eCmd == MsgCmd::KeypadButton) ||
-        (eCmd == MsgCmd::KeypadButtonLed) || (eCmd == MsgCmd::KeypadDial))
+    if (nBaseIndex == Keypad::nBaseIndex)
     {
         for (uint8_t i = 0; i < PDM_NUM_KEYPADS; i++)
             keypad[i].SetConfig(&stConfig.stKeypad[i]);

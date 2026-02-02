@@ -12,6 +12,8 @@ public:
 
     };
 
+    static const uint16_t nBaseIndex = 0x1800;
+
     void SetConfig(Config_Starter* config)
     {
         pConfig = config;
@@ -19,7 +21,6 @@ public:
     }
 
     void Update();
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx);
     static void SetDefaultConfig(Config_Starter *config);
 
     float fVal[PDM_NUM_OUTPUTS];

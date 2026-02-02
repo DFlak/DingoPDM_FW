@@ -5,6 +5,7 @@
 #include "mcu_utils.h"
 #include "dingopdm_config.h"
 #include "config.h"
+#include "param_protocol.h"
 #include "config_handler.h"
 #include "hw_devices.h"
 #include "can.h"
@@ -219,7 +220,7 @@ void CyclicUpdate()
                 keypad[i].CheckMsg(rxMsg);
 
             CheckRequestMsgs(&rxMsg);
-            ApplyConfig(ConfigHandler(&rxMsg));
+            ProcessParamMsg(&rxMsg);
         }
     }
 

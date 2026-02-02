@@ -28,13 +28,14 @@ public:
         }
     };
 
+    static const uint16_t nBaseIndex = 0x2000;
+
     msg_t Init(uint8_t index = 0);
 
     void CheckTimeout();
 
     bool CheckMsg(CANRxFrame frame);
 
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx);
     static void SetDefaultConfig(Config_Keypad *config);
 
     CANTxFrame GetTxMsg(uint8_t nIndex);

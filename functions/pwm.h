@@ -16,6 +16,8 @@ public:
     {
     }
 
+    static const uint16_t nBaseIndex = 0x1100;
+
     void SetConfig(Config_PwmOutput *config)
     {
         pConfig = config;
@@ -49,7 +51,6 @@ public:
     void On();
     void Off();
 
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx);
     static void SetDefaultConfig(Config_PwmOutput *config);
 
 private:

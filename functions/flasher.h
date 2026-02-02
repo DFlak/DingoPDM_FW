@@ -12,6 +12,8 @@ public:
 
     };
 
+    static const uint16_t nBaseIndex = 0x1700;
+
     void SetConfig(Config_Flasher* config)
     {
         pConfig = config;
@@ -19,7 +21,6 @@ public:
     }
 
     void Update(uint32_t timeNow);
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx);
     static void SetDefaultConfig(Config_Flasher *config);
 
     float fVal;

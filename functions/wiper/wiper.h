@@ -51,10 +51,11 @@ public:
         }
     };
 
+    static const uint16_t nBaseIndex = 0x1900;
+
     void Update();
     WiperSpeed GetSpeed() { return eSelectedSpeed; }
     WiperState GetState() { return eState; }
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx);
     static void SetDefaultConfig(Config_Wiper *config);
 
     float nSlowOut;

@@ -12,6 +12,8 @@ public:
         : m_line(line)
     {};
 
+    static const uint16_t nBaseIndex = 0x1200;
+
     void SetConfig(Config_Input *config)
     {
         pConfig = config;
@@ -20,7 +22,7 @@ public:
     }
 
     void Update();
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx);
+    static void SetDefaultConfig(Config_Input *config);
 
     float fVal;
 

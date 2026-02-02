@@ -11,6 +11,8 @@ public:
     Condition() {
     };
 
+    static const uint16_t nBaseIndex = 0x1500;
+
     void SetConfig(Config_Condition* config)
     {
         pConfig = config;
@@ -18,7 +20,6 @@ public:
     }
 
     void Update();
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx);
     static void SetDefaultConfig(Config_Condition *config);
 
     float fVal;

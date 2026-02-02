@@ -13,6 +13,8 @@ public:
 
     };
 
+    static const uint16_t nBaseIndex = 0x1600;
+
     void SetConfig(Config_Counter* config)
     {
         pConfig = config;
@@ -22,7 +24,6 @@ public:
     }
 
     void Update();
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx);
     static void SetDefaultConfig(Config_Counter *config);
 
     float fVal;

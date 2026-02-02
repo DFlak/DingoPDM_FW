@@ -3,49 +3,16 @@
 #include <cstdint>
 
 enum class MsgCmd : uint8_t
-{   //Response Tx = MsgCmd + 128
-    Null = 0,
-    Can = 1,
-    Inputs = 5,
-    Outputs = 10,
-    OutputsPwm = 11,
-    OutputsInrush = 12,
-    OutputsPwmDenom = 13,
-    VirtualInputs = 15,
-    VirtualInputsVars = 16,
-    Wiper = 20,
-    WiperSpeed = 21,
-    WiperDelays = 22,
-    WiperInputs = 23,
-    WiperInputs2 = 24,
-    Flashers = 25,
-    StarterDisable = 30,
-    CanInputs = 35,
-    CanInputsId = 36,
-    CanInputsOffset = 37,
-    CanInputsOperand = 38,
-    Counters = 40,
-    CountersInputs = 41,
-    Conditions = 45,
-    ConditionsArg = 46,
-    Keypad = 50,
-    KeypadLed = 51,
-    KeypadButton = 52,
-    KeypadButtonLed = 53,
-    KeypadDial = 54,
-    KeypadButtonVars = 55,
-    KeypadButtonVars2 = 56,
-    Version = 120,
-    Sleep = 121,
-    Bootloader = 125,
-    BurnSettings = 127
-};
-
-enum class MsgCmdResult : uint8_t
 {
-    Invalid = 0,
-    Request = 1,
-    Write = 2
+    Null = 0,
+    ReadParam = 1,
+    WriteParam = 2,
+    ReadAllParams = 3,
+    ResetToDefaults = 4,
+    BurnSettings = 5,
+    Version = 20,
+    Sleep = 21,
+    Bootloader = 22
 };
 
 enum class MsgType : uint8_t

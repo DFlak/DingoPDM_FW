@@ -11,11 +11,12 @@ public:
     CanInput() {
     };
 
+    static const uint16_t nBaseIndex = 0x1300;
+
     bool CheckMsg(CANRxFrame frame);
 
     void SetConfig(Config_CanInput* config) { pConfig = config; }
     void CheckTimeout();
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxFrame *tx);
     static void SetDefaultConfig(Config_CanInput *config);
 
     float fOutput;

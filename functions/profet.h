@@ -64,6 +64,8 @@ public:
         }
     }
 
+    static const uint16_t nBaseIndex = 0x1000;
+
     void SetConfig(Config_Output *config)
     {
         pConfig = config;
@@ -85,7 +87,6 @@ public:
         return 0;
     };
 
-    static MsgCmdResult ProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx);
     static void SetDefaultConfig(Config_Output *config);
 
     float fOutput;
