@@ -36,8 +36,6 @@ public:
 
     bool CheckMsg(CANRxFrame frame);
 
-    static void SetDefaultConfig(Config_Keypad *config);
-
     CANTxFrame GetTxMsg(uint8_t nIndex);
     CANTxFrame GetStartMsg();
 

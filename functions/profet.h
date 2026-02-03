@@ -76,7 +76,7 @@ public:
 
     void Update(bool bOutEnabled);
 
-    float GetCurrent() { return nCurrent; }
+    float GetCurrent() { return fCurrent; }
     ProfetState GetState() { return eState; }
     uint16_t GetOcCount() { return nOcCount; }
     uint8_t GetDutyCycle()
@@ -86,8 +86,6 @@ public:
 
         return 0;
     };
-
-    static void SetDefaultConfig(Config_Output *config);
 
     float fOutput;
     float nOvercurrent;
@@ -112,7 +110,7 @@ private:
     ProfetState eReqState;
     ProfetState eLastState;
 
-    uint16_t nCurrent;    // Scaled current value (amps)
+    float fCurrent;       // Amps
     uint16_t nIS;         // Raw analog current value
     uint16_t nLastIS = 0; // Last analog current value
     float fKILIS;         // Current scaling factor

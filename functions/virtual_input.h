@@ -24,7 +24,6 @@ public:
     }
 
     void Update();
-    static void SetDefaultConfig(Config_VirtualInput *config);
 
     float fVal;
 

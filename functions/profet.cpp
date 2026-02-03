@@ -70,9 +70,7 @@ void Profet::Update(bool bOutEnabled)
     // Analog value must be ready before reading to allow for conversion after DSEL change
     // Use the measured VDDA value to calculate volts/step
     // Current = (rawVal * (VDDA / 4095)) / 1.2k) * kILIS
-    // NOTE: IS is converted to nCurrent = A * 10
-    // Example: 0.1A = 1, 1.0A = 10, 10A = 100
-    nCurrent = (uint16_t)((((float)nIS * (GetVDDA() / 4095)) / 1200) * fKILIS);
+    fCurrent = (((float)nIS * (GetVDDA() / 4095)) / 1200) * fKILIS;
 
     // Ignore current less than a low value
     // Not capable of measuring that low anyways
@@ -80,17 +78,17 @@ void Profet::Update(bool bOutEnabled)
     switch (m_model)
     {
     case ProfetModel::BTS7002_1EPP:
-        if (nCurrent <= 5) // 0.5A
-            nCurrent = 0;
+        if (fCurrent <= 0.5f)
+            fCurrent = 0;
         break;
     case ProfetModel::BTS7008_2EPA_CH1:
     case ProfetModel::BTS7008_2EPA_CH2:
-        if (nCurrent <= 2) // 0.2A
-            nCurrent = 0;
+        if (fCurrent <= 0.2f)
+            fCurrent = 0;
         break;
     case ProfetModel::BTS70012_1ESP:
-        if (nCurrent <= 10) // 1.0A
-            nCurrent = 0;
+        if (fCurrent <= 1.0f)
+            fCurrent = 0;
         break;
     }
 
@@ -133,7 +131,7 @@ void Profet::Update(bool bOutEnabled)
         }
 
         // Overcurrent
-        if (nCurrent > pConfig->nCurrentLimit && !bInRushActive)
+        if (fCurrent > pConfig->fCurrentLimit && !bInRushActive)
         {
             nOcTriggerTime = SYS_TIME;
             nOcCount++;
@@ -141,7 +139,7 @@ void Profet::Update(bool bOutEnabled)
         }
 
         // Inrush overcurrent
-        if (nCurrent > pConfig->nInrushLimit && bInRushActive)
+        if (fCurrent > pConfig->fInrushLimit && bInRushActive)
         {
             nOcTriggerTime = SYS_TIME;
             nOcCount++;
@@ -198,18 +196,4 @@ void Profet::Update(bool bOutEnabled)
     nFault = eState == ProfetState::Fault ? 1 : 0;
 
     palClearLine(LINE_E2);
-}
-
-void Profet::SetDefaultConfig(Config_Output *config)
-{
-    config->bEnabled = false;
-    config->nInput = 0;
-    config->nCurrentLimit = 20;
-    config->nInrushLimit = 30;
-    config->nInrushTime = 1000;
-    config->eResetMode = ProfetResetMode::None;
-    config->nResetTime = 1000;
-    config->nResetLimit = 0;
-    
-    Pwm::SetDefaultConfig(&config->stPwm);
 }

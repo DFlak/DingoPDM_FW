@@ -51,8 +51,6 @@ public:
     void On();
     void Off();
 
-    static void SetDefaultConfig(Config_PwmOutput *config);
-
 private:
     PWMDriver *m_pwm;
     const PWMConfig *m_pwmCfg;

@@ -100,15 +100,3 @@ void Pwm::Off()
     pwmDisablePeriodicNotification(m_pwm);
     pwmDisableChannel(m_pwm, static_cast<uint8_t>(m_pwmCh));
 }
-
-void Pwm::SetDefaultConfig(Config_PwmOutput *config)
-{
-    config->bEnabled = false;
-    config->bSoftStart = false;
-    config->bVariableDutyCycle = false;
-    config->nDutyCycleInput = 0;
-    config->nFixedDutyCycle = 50;
-    config->nFreq = 100;
-    config->nSoftStartRampTime = 1000;
-    config->nDutyCycleInputDenom = 100;
-}

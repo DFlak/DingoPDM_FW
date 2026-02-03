@@ -47,12 +47,3 @@ void Digital::SetPull(InputPull pull)
         break;
     }
 }
-
-void Digital::SetDefaultConfig(Config_Input *config)
-{
-    config->bEnabled = false;
-    config->eMode = InputMode::Momentary;
-    config->nDebounceTime = 50;
-    config->bInvert = false;
-    config->ePull = InputPull::None;
-}

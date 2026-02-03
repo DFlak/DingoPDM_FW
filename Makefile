@@ -149,6 +149,8 @@ CPPSRC = $(ALLCPPSRC) \
 				 core/config_handler.cpp \
 				 core/error.cpp \
 				 core/led.cpp \
+				 core/param_protocol.cpp \
+				 core/param_registry.cpp \
 				 core/pdm.cpp \
 				 core/sleep.cpp \
 				 core/status.cpp \

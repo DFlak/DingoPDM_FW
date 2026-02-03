@@ -17,7 +17,6 @@ public:
 
     void SetConfig(Config_CanInput* config) { pConfig = config; }
     void CheckTimeout();
-    static void SetDefaultConfig(Config_CanInput *config);
 
     float fOutput;
     float fVal;

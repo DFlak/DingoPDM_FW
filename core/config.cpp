@@ -1,15 +1,7 @@
 #include "config.h"
 #include "error.h"
 #include "crc.h"
-#include "profet.h"
-#include "virtual_input.h"
-#include "flasher.h"
-#include "starter.h"
-#include "wiper/wiper.h"
-#include "can_input.h"
-#include "counter.h"
-#include "condition.h"
-#include "keypad/keypad.h"
+#include "param_protocol.h"
 
 MB85RC fram(I2CD1, MB85RC_I2CADDR_DEFAULT);
 
@@ -66,64 +58,6 @@ bool WriteConfig(){
     return true;
 }
 
-void SetDefaultConfig()
-{
-    stConfig.stDevConfig.nConfigVersion = CONFIG_VERSION;
-    stConfig.stDevConfig.eCanSpeed = CanBitrate::Bitrate_500K;
-    stConfig.stDevConfig.bCanFilterEnabled = false;
-    stConfig.stDevConfig.bSleepEnabled = true;
-
-    for(uint8_t i = 0; i < PDM_NUM_INPUTS; i++)
-    {
-        stConfig.stInput[i].bEnabled = false;
-        stConfig.stInput[i].eMode = InputMode::Momentary;
-        stConfig.stInput[i].bInvert = true;
-        stConfig.stInput[i].nDebounceTime = 20;
-        stConfig.stInput[i].ePull = InputPull::Up;
-    }
-
-    for(uint8_t i = 0; i < PDM_NUM_VIRT_INPUTS; i++)
-    {
-        VirtualInput::SetDefaultConfig(&stConfig.stVirtualInput[i]);
-    }
-
-    for(uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
-    {
-        Profet::SetDefaultConfig(&stConfig.stOutput[i]);
-    }
-
-    Wiper::SetDefaultConfig(&stConfig.stWiper);
-
-    for(uint8_t i = 0; i < PDM_NUM_FLASHERS; i++)
-    {
-        Flasher::SetDefaultConfig(&stConfig.stFlasher[i]);
-    }
-
-    Starter::SetDefaultConfig(&stConfig.stStarter);
-
-    for(uint8_t i = 0; i < PDM_NUM_CAN_INPUTS; i++)
-    {
-        CanInput::SetDefaultConfig(&stConfig.stCanInput[i]);
-    }
-
-    stConfig.stCanOutput.nBaseId = 2000;
-
-    for(uint8_t i=0; i < PDM_NUM_COUNTERS; i++)
-    {
-        Counter::SetDefaultConfig(&stConfig.stCounter[i]);
-    }
-
-    for(uint8_t i = 0; i < PDM_NUM_CONDITIONS; i++)
-    {
-        Condition::SetDefaultConfig(&stConfig.stCondition[i]);
-    }
-
-    for(uint8_t i = 0; i < PDM_NUM_KEYPADS; i++)
-    {
-        Keypad::SetDefaultConfig(&stConfig.stKeypad[i]);
-    }
-}
-
 void InitConfig()
 {
     if(!fram.CheckId())
@@ -135,7 +69,7 @@ void InitConfig()
             Error::SetFatalError(FatalErrorType::ErrFRAM, MsgSrc::Config);
         
         //Write default for next power cycle
-        SetDefaultConfig();
+        SetAllDefaultParams();
         if(!WriteConfig()){
             //Couldn't write default config
             //FRAM issue 

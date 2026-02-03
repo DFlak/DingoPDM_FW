@@ -48,11 +48,3 @@ void Condition::Update()
             break;
     }
 }
-
-void Condition::SetDefaultConfig(Config_Condition *config)
-{
-    config->bEnabled = false;
-    config->eOperator = Operator::Equal;
-    config->nInput = 0;
-    config->fArg = 0.0f;
-}

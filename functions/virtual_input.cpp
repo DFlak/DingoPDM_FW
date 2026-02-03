@@ -60,17 +60,3 @@ void VirtualInput::Update()
 
     fVal = input.Check(pConfig->eMode, false, bResultSec1);
 }
-
-void VirtualInput::SetDefaultConfig(Config_VirtualInput *config)
-{
-    config->bEnabled = false;
-    config->bNot0 = false;
-    config->nVar0 = 0;
-    config->eCond0 = BoolOperator::And;
-    config->bNot1 = false;
-    config->nVar1 = 0;
-    config->eCond1 = BoolOperator::And;
-    config->bNot2 = false;
-    config->nVar2 = 0;
-    config->eMode = InputMode::Momentary;
-}

@@ -26,12 +26,3 @@ void Flasher::Update(uint32_t nTimeNow)
         nTimeOff = nTimeNow;
     }
 }
-
-void Flasher::SetDefaultConfig(Config_Flasher *config)
-{
-    config->bEnabled = false;
-    config->nInput = 0;
-    config->nFlashOnTime = 500;
-    config->nFlashOffTime = 500;
-    config->bSingleCycle = false;
-}

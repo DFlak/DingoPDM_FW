@@ -34,9 +34,9 @@ struct ParamInfo
     uint8_t nSubIndex;
     void* pVal;
     ParamType eType;
-    uint32_t nDefaultVal;
-    uint32_t nMinVal;
-    uint32_t nMaxVal;
+    float fDefaultVal;
+    float fMinVal;
+    float fMaxVal;
 };
 
 extern const ParamInfo stParams[];

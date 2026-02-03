@@ -40,13 +40,14 @@ void ApplyAllConfig()
 }
 
 void ApplyConfig(uint16_t nIndex)
-{ 
+{
     uint16_t nBaseIndex = nIndex & 0xFF00;
 
-    if (eCmd == MsgCmd::Can)
+    // Device config (0x0000)
+    if (nBaseIndex == 0x0000)
     {
         // TODO: Change CAN speed and filters without requiring reset
-
+        
         SetCanFilterEnabled(stConfig.stDevConfig.bCanFilterEnabled);
     }
 

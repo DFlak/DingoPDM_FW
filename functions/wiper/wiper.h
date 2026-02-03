@@ -56,7 +56,6 @@ public:
     void Update();
     WiperSpeed GetSpeed() { return eSelectedSpeed; }
     WiperState GetState() { return eState; }
-    static void SetDefaultConfig(Config_Wiper *config);
 
     float nSlowOut;
     float nFastOut;

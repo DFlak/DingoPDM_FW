@@ -70,22 +70,3 @@ void CanInput::CheckTimeout()
         fOutput = 0;
     }
 }
-
-void CanInput::SetDefaultConfig(Config_CanInput *config)
-{
-    config->bEnabled = false;
-    config->bTimeoutEnabled = true;
-    config->nTimeout = 20;
-    config->nIDE = 0;
-    config->nSID = 0;
-    config->nEID = 0;
-    config->nStartBit = 0;
-    config->nBitLength = 0;
-    config->fFactor = 1.0f;      // Default to no scaling
-    config->fOffset = 0.0f;     // Default to no offset
-    config->eByteOrder = ByteOrder::LittleEndian;
-    config->bSigned = false;
-    config->eOperator = Operator::Equal;
-    config->fOperand = 0.0f;
-    config->eMode = InputMode::Momentary;
-}

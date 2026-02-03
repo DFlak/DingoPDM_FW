@@ -3,6 +3,7 @@
 #include "config.h"
 #include "mailbox.h"
 #include "config_handler.h"
+#include <cstring>
 
 extern PdmConfig stConfig;
 
@@ -53,7 +54,13 @@ void SendAllNonDefaultParams() {
 
 void SetAllDefaultParams() {
     for (int i = 0; i < NUM_PARAMS; i++) {
-        WriteParam(&stParams[i], stParams[i].nDefaultVal);
+        uint32_t defaultVal;
+        if (stParams[i].eType == ParamType::Float) {
+            memcpy(&defaultVal, &stParams[i].fDefaultVal, sizeof(float));
+        } else {
+            defaultVal = static_cast<uint32_t>(stParams[i].fDefaultVal);
+        }
+        WriteParam(&stParams[i], defaultVal);
     }
 }
 

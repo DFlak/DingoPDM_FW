@@ -20,7 +20,6 @@ public:
     }
 
     void Update();
-    static void SetDefaultConfig(Config_Condition *config);
 
     float fVal;
 

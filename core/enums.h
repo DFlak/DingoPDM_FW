@@ -10,9 +10,17 @@ enum class MsgCmd : uint8_t
     ReadAllParams = 3,
     ResetToDefaults = 4,
     BurnSettings = 5,
+    Can = 6,
     Version = 20,
     Sleep = 21,
     Bootloader = 22
+};
+
+enum class MsgCmdResult : uint8_t
+{
+    Invalid,
+    Write,
+    Request
 };
 
 enum class MsgType : uint8_t

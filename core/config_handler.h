@@ -4,4 +4,4 @@
 #include "config.h"
 
 void ApplyAllConfig();
-void ApplyConfig(MsgCmd eCmd);
+void ApplyConfig(uint16_t nIndex);

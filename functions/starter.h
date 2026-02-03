@@ -21,7 +21,6 @@ public:
     }
 
     void Update();
-    static void SetDefaultConfig(Config_Starter *config);
 
     float fVal[PDM_NUM_OUTPUTS];
 

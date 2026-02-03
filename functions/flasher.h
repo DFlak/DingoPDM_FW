@@ -21,7 +21,6 @@ public:
     }
 
     void Update(uint32_t timeNow);
-    static void SetDefaultConfig(Config_Flasher *config);
 
     float fVal;
 

@@ -22,7 +22,6 @@ public:
     }
 
     void Update();
-    static void SetDefaultConfig(Config_Input *config);
 
     float fVal;
 
