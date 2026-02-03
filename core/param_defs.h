@@ -17,7 +17,7 @@
     {0x1000 + (i), 4,  &stConfig.stOutput[i].nInrushTime,           ParamType::UInt16, 100, 0, 10000}, \
     {0x1000 + (i), 5,  &stConfig.stOutput[i].eResetMode,            ParamType::Enum,   0, 0, 2}, \
     {0x1000 + (i), 6,  &stConfig.stOutput[i].nResetTime,            ParamType::UInt16, 1000, 0, 60000}, \
-    {0x1000 + (i), 7,  &stConfig.stOutput[i].nResetLimit,           ParamType::UInt8,  3, 0, 10}, \
+    {0x1000 + (i), 7,  &stConfig.stOutput[i].nResetLimit,           ParamType::UInt8,  3, 0, 20}, \
     {0x1000 + (i), 8,  &stConfig.stOutput[i].stPwm.bEnabled,        ParamType::Bool,   0, 0, 1}, \
     {0x1000 + (i), 9,  &stConfig.stOutput[i].stPwm.bSoftStart,      ParamType::Bool,   0, 0, 1}, \
     {0x1000 + (i), 10, &stConfig.stOutput[i].stPwm.bVariableDutyCycle, ParamType::Bool, 0, 0, 1}, \
@@ -32,7 +32,7 @@
 //=============================================================================
 #define DIGITAL_INPUT_PARAMS(i) \
     {0x1200 + (i), 0, &stConfig.stInput[i].bEnabled,      ParamType::Bool,   0, 0, 1}, \
-    {0x1200 + (i), 1, &stConfig.stInput[i].eMode,         ParamType::Enum,   0, 0, 2}, \
+    {0x1200 + (i), 1, &stConfig.stInput[i].eMode,         ParamType::Enum,   0, 0, 1}, \
     {0x1200 + (i), 2, &stConfig.stInput[i].bInvert,       ParamType::Bool,   0, 0, 1}, \
     {0x1200 + (i), 3, &stConfig.stInput[i].nDebounceTime, ParamType::UInt16, 20, 0, 1000}, \
     {0x1200 + (i), 4, &stConfig.stInput[i].ePull,         ParamType::Enum,   0, 0, 2}
@@ -53,9 +53,9 @@
     {0x1300 + (i), 9,  &stConfig.stCanInput[i].fOffset,         ParamType::Float,  0.0f, -1e9f, 1e9f}, \
     {0x1300 + (i), 10, &stConfig.stCanInput[i].eByteOrder,      ParamType::Enum,   0, 0, 1}, \
     {0x1300 + (i), 11, &stConfig.stCanInput[i].bSigned,         ParamType::Bool,   0, 0, 1}, \
-    {0x1300 + (i), 12, &stConfig.stCanInput[i].eOperator,       ParamType::Enum,   0, 0, 5}, \
+    {0x1300 + (i), 12, &stConfig.stCanInput[i].eOperator,       ParamType::Enum,   0, 0, 7}, \
     {0x1300 + (i), 13, &stConfig.stCanInput[i].fOperand,        ParamType::Float,  0.0f, -1e9f, 1e9f}, \
-    {0x1300 + (i), 14, &stConfig.stCanInput[i].eMode,           ParamType::Enum,   0, 0, 2}
+    {0x1300 + (i), 14, &stConfig.stCanInput[i].eMode,           ParamType::Enum,   0, 0, 1}
 
 //=============================================================================
 // Virtual Input Parameters - Base 0x1400
@@ -70,7 +70,7 @@
     {0x1400 + (i), 6,  &stConfig.stVirtualInput[i].eCond1,   ParamType::Enum,   0, 0, 2}, \
     {0x1400 + (i), 7,  &stConfig.stVirtualInput[i].bNot2,    ParamType::Bool,   0, 0, 1}, \
     {0x1400 + (i), 8,  &stConfig.stVirtualInput[i].nVar2,    ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
-    {0x1400 + (i), 9,  &stConfig.stVirtualInput[i].eMode,    ParamType::Enum,   0, 0, 2}
+    {0x1400 + (i), 9,  &stConfig.stVirtualInput[i].eMode,    ParamType::Enum,   0, 0, 1}
 
 //=============================================================================
 // Condition Parameters - Base 0x1500
@@ -78,7 +78,7 @@
 #define CONDITION_PARAMS(i) \
     {0x1500 + (i), 0, &stConfig.stCondition[i].bEnabled,  ParamType::Bool,   0, 0, 1}, \
     {0x1500 + (i), 1, &stConfig.stCondition[i].nInput,    ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
-    {0x1500 + (i), 2, &stConfig.stCondition[i].eOperator, ParamType::Enum,   0, 0, 5}, \
+    {0x1500 + (i), 2, &stConfig.stCondition[i].eOperator, ParamType::Enum,   0, 0, 7}, \
     {0x1500 + (i), 3, &stConfig.stCondition[i].fArg,      ParamType::Float,  0.0f, -1e9f, 1e9f}
 
 //=============================================================================
@@ -122,7 +122,7 @@
 //=============================================================================
 #define WIPER_PARAMS() \
     {0x1900, 0,  &stConfig.stWiper.bEnabled,       ParamType::Bool,   0, 0, 1}, \
-    {0x1900, 1,  &stConfig.stWiper.eMode,          ParamType::Enum,   0, 0, 3}, \
+    {0x1900, 1,  &stConfig.stWiper.eMode,          ParamType::Enum,   0, 0, 2}, \
     {0x1900, 2,  &stConfig.stWiper.nSlowInput,     ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
     {0x1900, 3,  &stConfig.stWiper.nFastInput,     ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
     {0x1900, 4,  &stConfig.stWiper.nInterInput,    ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
@@ -136,14 +136,14 @@
 
 // Wiper speed map array
 #define WIPER_SPEED_MAP_PARAMS() \
-    {0x1900, 12, &stConfig.stWiper.eSpeedMap[0], ParamType::Enum, 0, 0, 3}, \
-    {0x1900, 13, &stConfig.stWiper.eSpeedMap[1], ParamType::Enum, 0, 0, 3}, \
-    {0x1900, 14, &stConfig.stWiper.eSpeedMap[2], ParamType::Enum, 0, 0, 3}, \
-    {0x1900, 15, &stConfig.stWiper.eSpeedMap[3], ParamType::Enum, 0, 0, 3}, \
-    {0x1900, 16, &stConfig.stWiper.eSpeedMap[4], ParamType::Enum, 0, 0, 3}, \
-    {0x1900, 17, &stConfig.stWiper.eSpeedMap[5], ParamType::Enum, 0, 0, 3}, \
-    {0x1900, 18, &stConfig.stWiper.eSpeedMap[6], ParamType::Enum, 0, 0, 3}, \
-    {0x1900, 19, &stConfig.stWiper.eSpeedMap[7], ParamType::Enum, 0, 0, 3}
+    {0x1900, 12, &stConfig.stWiper.eSpeedMap[0], ParamType::Enum, 3, 0, 8}, \
+    {0x1900, 13, &stConfig.stWiper.eSpeedMap[1], ParamType::Enum, 4, 0, 8}, \
+    {0x1900, 14, &stConfig.stWiper.eSpeedMap[2], ParamType::Enum, 5, 0, 8}, \
+    {0x1900, 15, &stConfig.stWiper.eSpeedMap[3], ParamType::Enum, 6, 0, 8}, \
+    {0x1900, 16, &stConfig.stWiper.eSpeedMap[4], ParamType::Enum, 7, 0, 8}, \
+    {0x1900, 17, &stConfig.stWiper.eSpeedMap[5], ParamType::Enum, 8, 0, 8}, \
+    {0x1900, 18, &stConfig.stWiper.eSpeedMap[6], ParamType::Enum, 1, 0, 8}, \
+    {0x1900, 19, &stConfig.stWiper.eSpeedMap[7], ParamType::Enum, 2, 0, 8}
 
 // Wiper intermittent delay array
 #define WIPER_INTERMIT_PARAMS() \
@@ -175,7 +175,7 @@
 //=============================================================================
 #define DEVICE_CONFIG_PARAMS() \
     {0x0000, 0, &stConfig.stDevConfig.nConfigVersion,    ParamType::UInt16, CONFIG_VERSION, 0, 0xFFFF}, \
-    {0x0000, 1, &stConfig.stDevConfig.eCanSpeed,         ParamType::Enum,   0, 0, 4}, \
+    {0x0000, 1, &stConfig.stDevConfig.eCanSpeed,         ParamType::Enum,   1, 0, 4}, \
     {0x0000, 2, &stConfig.stDevConfig.bSleepEnabled,     ParamType::Bool,   0, 0, 1}, \
     {0x0000, 3, &stConfig.stDevConfig.bCanFilterEnabled, ParamType::Bool,   0, 0, 1}
 
@@ -183,4 +183,4 @@
 // CAN Output Parameters - Base 0x0010
 //=============================================================================
 #define CAN_OUTPUT_PARAMS() \
-    {0x0010, 0, &stConfig.stCanOutput.nBaseId, ParamType::UInt16, 0x600, 0, 0x7FF}
+    {0x0010, 0, &stConfig.stCanOutput.nBaseId, ParamType::UInt16, 0x7D0, 0, 0x7FF}
