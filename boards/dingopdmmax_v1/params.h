@@ -3,7 +3,9 @@
 #include "param_defs.h"
 
 //=============================================================================
-// Board-specific parameter expansions for dingopdmmax_v1
+// Board-specific parameters
+// These macros expand to lists of parameters for each type of function
+// Modify as needed for each board
 //=============================================================================
 
 // Outputs (4)

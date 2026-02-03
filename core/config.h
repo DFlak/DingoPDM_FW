@@ -19,7 +19,7 @@ struct Config_Input{
   bool bEnabled;
   InputMode eMode;
   bool bInvert;
-  uint16_t nDebounceTime;
+  uint16_t nDebounceTime; //ms
   InputPull ePull;
 };
 
@@ -41,10 +41,10 @@ struct Config_PwmOutput{
   bool bSoftStart;
   bool bVariableDutyCycle;
   uint16_t nDutyCycleInput;
-  uint8_t nFixedDutyCycle; //0-100
-  uint16_t nFreq; //0-400Hz
-  uint16_t nSoftStartRampTime; //0-2000ms
-  uint16_t nDutyCycleInputDenom; //0-5000
+  uint8_t nFixedDutyCycle;
+  uint16_t nFreq;
+  uint16_t nSoftStartRampTime; //ms
+  uint16_t nDutyCycleInputDenom;
 };
 
 struct Config_Output{
@@ -52,9 +52,9 @@ struct Config_Output{
   uint16_t nInput;
   float fCurrentLimit;
   float fInrushLimit;
-  uint16_t nInrushTime;
+  uint16_t nInrushTime; //ms
   ProfetResetMode eResetMode;
-  uint16_t nResetTime;
+  uint16_t nResetTime; //ms
   uint8_t nResetLimit;
 
   Config_PwmOutput stPwm;
@@ -74,14 +74,14 @@ struct Config_Wiper{
   uint16_t nWashInput;
   uint8_t nWashWipeCycles;
   WiperSpeed eSpeedMap[PDM_NUM_WIPER_SPEED_MAP];
-  uint16_t nIntermitTime[PDM_NUM_WIPER_INTER_DELAYS];
+  uint16_t nIntermitTime[PDM_NUM_WIPER_INTER_DELAYS]; //ms
 };
 
 struct Config_Flasher{
   bool bEnabled;
   uint16_t nInput;
-  uint16_t nFlashOnTime;
-  uint16_t nFlashOffTime;
+  uint16_t nFlashOnTime; //ms
+  uint16_t nFlashOffTime; //ms
   bool bSingleCycle;
 };
 
