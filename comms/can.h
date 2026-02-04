@@ -10,4 +10,3 @@ void ClearCanFilters();
 void SetCanFilterId(uint8_t nFilterNum, uint32_t nId, bool bExtended);
 void SetCanFilterEnabled(bool bEnabled);
 uint32_t GetLastCanRxTime();
-MsgCmdResult CanProcessSettingsMsg(PdmConfig *conf, CANRxFrame *rx, CANTxFrame *tx);

@@ -88,6 +88,7 @@ public:
     };
 
     float fOutput;
+    float fCurrent;
     float nOvercurrent;
     float nFault;
 
@@ -110,7 +111,6 @@ private:
     ProfetState eReqState;
     ProfetState eLastState;
 
-    float fCurrent;       // Amps
     uint16_t nIS;         // Raw analog current value
     uint16_t nLastIS = 0; // Last analog current value
     float fKILIS;         // Current scaling factor

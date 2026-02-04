@@ -41,6 +41,7 @@ public:
 
     float fVal[KEYPAD_MAX_BUTTONS];
     float nDialVal[KEYPAD_MAX_DIALS];
+    float fAnalogVal[KEYPAD_MAX_ANALOG_INPUTS];
 
 protected:
     Config_Keypad* pConfig;

@@ -10,17 +10,9 @@ enum class MsgCmd : uint8_t
     ReadAllParams = 3,
     ResetToDefaults = 4,
     BurnSettings = 5,
-    Can = 6,
     Version = 20,
     Sleep = 21,
     Bootloader = 22
-};
-
-enum class MsgCmdResult : uint8_t
-{
-    Invalid,
-    Write,
-    Request
 };
 
 enum class MsgType : uint8_t
@@ -32,13 +24,10 @@ enum class MsgType : uint8_t
 
 enum class MsgSrc : uint8_t
 {
-  State_PowerOn = 1,
-  State_Starting,
-  State_Run,
+  State_Run = 1,
+  State_Sleep,
   State_Overtemp,
   State_Error,
-  State_Sleep,
-  State_Wake,
   Overcurrent,
   Voltage,
   CAN,
@@ -186,7 +175,8 @@ enum class FatalErrorType : uint8_t
   ErrI2C,
   ErrRCC,
   ErrTemp,
-  ErrPwm
+  ErrPwm,
+  ErrVarMap
 };
 
 enum class PwmChannel : uint8_t
