@@ -50,6 +50,8 @@ public:
     
     void On();
     void Off();
+    void EnsureStarted();
+    void OverrideFrequency(uint16_t nFreq);
 
 private:
     PWMDriver *m_pwm;

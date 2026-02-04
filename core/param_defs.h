@@ -35,7 +35,8 @@
     {0x1000 + (i), 12, &stConfig.stOutput[i].stPwm.nFixedDutyCycle,         ParamType::UInt8,  100, 0, 100}, \
     {0x1000 + (i), 13, &stConfig.stOutput[i].stPwm.nFreq,                   ParamType::UInt16, 100, 0, 400}, \
     {0x1000 + (i), 14, &stConfig.stOutput[i].stPwm.nSoftStartRampTime,      ParamType::UInt16, 0, 0, 2000}, \
-    {0x1000 + (i), 15, &stConfig.stOutput[i].stPwm.nDutyCycleInputDenom,    ParamType::UInt16, 100, 0, 5000}
+    {0x1000 + (i), 15, &stConfig.stOutput[i].stPwm.nDutyCycleInputDenom,    ParamType::UInt16, 100, 0, 5000}, \
+    {0x1000 + (i), 16, &stConfig.stOutput[i].nPrimaryOutput,                ParamType::UInt8,  -1, -1, PDM_NUM_OUTPUTS - 1}
 
 //=============================================================================
 // Digital Input Parameters - Base 0x1200

@@ -15,25 +15,19 @@ void Profet::Update(bool bOutEnabled)
         return;
     }
 
+    HandleDsel();
+
+    // Follower device — mirror primary
+    if (pPrimary != nullptr)
+    {
+        FollowerUpdate();
+        return;
+    }
+
     if ((*pInput) && bOutEnabled)
         eReqState = ProfetState::On;
     else
         eReqState = ProfetState::Off;
-
-    // Set DSEL pin to select the appropriate IS channel
-    // Only valid on 2 channel devices
-    // Wait for DSEL changeover and ADC conversion to complete
-    // DSEL changeover takes max ~60us
-    if (m_model == ProfetModel::BTS7008_2EPA_CH1)
-    {
-        palClearLine(m_dsel);
-        chThdSleepMicroseconds(60);
-    }
-    else if (m_model == ProfetModel::BTS7008_2EPA_CH2)
-    {
-        palSetLine(m_dsel);
-        chThdSleepMicroseconds(60);
-    }
 
     static uint32_t nCNT = 0;
     static uint32_t nCCR = 0;
@@ -66,31 +60,11 @@ void Profet::Update(bool bOutEnabled)
     else
         nIS = GetAdcRaw(m_ain);
 
-    // Calculate current at ADC, multiply by kILIS ratio to get output current
-    // Analog value must be ready before reading to allow for conversion after DSEL change
-    // Use the measured VDDA value to calculate volts/step
-    // Current = (rawVal * (VDDA / 4095)) / 1.2k) * kILIS
-    fCurrent = (((float)nIS * (GetVDDA() / 4095)) / 1200) * fKILIS;
+    CalculateCurrent();
 
-    // Ignore current less than a low value
-    // Not capable of measuring that low anyways
-    // Depending on the model the value changes
-    switch (m_model)
-    {
-    case ProfetModel::BTS7002_1EPP:
-        if (fCurrent <= 0.5f)
-            fCurrent = 0;
-        break;
-    case ProfetModel::BTS7008_2EPA_CH1:
-    case ProfetModel::BTS7008_2EPA_CH2:
-        if (fCurrent <= 0.2f)
-            fCurrent = 0;
-        break;
-    case ProfetModel::BTS70012_1ESP:
-        if (fCurrent <= 1.0f)
-            fCurrent = 0;
-        break;
-    }
+    // Sum follower current into primary's reported current
+    if (pFollower != nullptr && pFollower->eState != ProfetState::Fault)
+        fCurrent += pFollower->fCurrent;
 
     // Check for fault (device overcurrent/overtemp/short)
     // Raw ADC current reading will be very high
@@ -98,6 +72,10 @@ void Profet::Update(bool bOutEnabled)
     {
         eState = ProfetState::Fault;
     }
+
+    // Follower hardware fault is permanent — bring down the primary too
+    if (pFollower != nullptr && pFollower->eState == ProfetState::Fault)
+        eState = ProfetState::Fault;
 
     bInRushActive = (pConfig->nInrushTime + nInRushOnTime) > SYS_TIME;
 
@@ -196,4 +174,90 @@ void Profet::Update(bool bOutEnabled)
     nFault = eState == ProfetState::Fault ? 1 : 0;
 
     palClearLine(LINE_E2);
+}
+
+void Profet::FollowerUpdate()
+{
+    nIS = GetAdcRaw(m_ain);
+    CalculateCurrent();
+
+    // Hardware fault — independent, permanent
+    if (nIS > 30000)
+        eState = ProfetState::Fault;
+
+    if (eState == ProfetState::Fault)
+    {
+        pwm.Off();
+        palClearLine(m_in);
+        fOutput = 0; nOvercurrent = 0; nFault = 1;
+        return;
+    }
+
+    // Mirror primary state
+    if (pPrimary->eState == ProfetState::On)
+    {
+        if (pPrimary->IsPwmEnabled())
+        {
+            pwm.EnsureStarted();
+            pwm.OverrideFrequency(pPrimary->GetFrequency());
+            pwm.SetDutyCycle(pPrimary->GetDutyCycle());
+            pwm.On();
+        }
+        else
+        {
+            pwm.Off();
+            palSetLine(m_in);
+        }
+        eState = ProfetState::On;
+    }
+    else
+    {
+        pwm.Off();
+        palClearLine(m_in);
+        eState = pPrimary->eState;
+    }
+
+    fOutput = eState == ProfetState::On ? 1 : 0;
+    nOvercurrent = eState == ProfetState::Overcurrent ? 1 : 0;
+    nFault = 0;
+}
+
+void Profet::HandleDsel()
+{
+    // Select the appropriate IS channel on dual-channel devices
+    // DSEL changeover takes max ~60us
+    if (m_model == ProfetModel::BTS7008_2EPA_CH1)
+    {
+        palClearLine(m_dsel);
+        chThdSleepMicroseconds(60);
+    }
+    else if (m_model == ProfetModel::BTS7008_2EPA_CH2)
+    {
+        palSetLine(m_dsel);
+        chThdSleepMicroseconds(60);
+    }
+}
+
+void Profet::CalculateCurrent()
+{
+    // Current = (rawVal * (VDDA / 4095)) / 1.2k) * kILIS
+    fCurrent = (((float)nIS * (GetVDDA() / 4095)) / 1200) * fKILIS;
+
+    // Noise floor — ignore current below measurable threshold
+    switch (m_model)
+    {
+    case ProfetModel::BTS7002_1EPP:
+        if (fCurrent <= 0.5f)
+            fCurrent = 0;
+        break;
+    case ProfetModel::BTS7008_2EPA_CH1:
+    case ProfetModel::BTS7008_2EPA_CH2:
+        if (fCurrent <= 0.2f)
+            fCurrent = 0;
+        break;
+    case ProfetModel::BTS70012_1ESP:
+        if (fCurrent <= 1.0f)
+            fCurrent = 0;
+        break;
+    }
 }

@@ -104,6 +104,28 @@ void ApplyConfig(uint16_t nIndex)
     {
         for (uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
             pf[i].SetConfig(&stConfig.stOutput[i]);
+
+        // Clear all pairing pointers before linking
+        for (uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
+        {
+            pf[i].pPrimary  = nullptr;
+            pf[i].pFollower = nullptr;
+        }
+
+        // Link follower -> primary pairs with validation
+        for (uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
+        {
+            int8_t pri = stConfig.stOutput[i].nPrimaryOutput;
+
+            if (pri == -1)                                           continue; // unpaired
+            if (pri == i)                                            continue; // self-pair
+            if (pri >= PDM_NUM_OUTPUTS)                              continue; // out of range
+            if (stConfig.stOutput[pri].nPrimaryOutput != -1)         continue; // primary is itself a follower (no chains)
+            if (!stConfig.stOutput[pri].bEnabled)                    continue; // primary not enabled
+
+            pf[i].pPrimary      = &pf[pri];
+            pf[pri].pFollower   = &pf[i];
+        }
     }
 
     if (nBaseIndex == Wiper::nBaseIndex)

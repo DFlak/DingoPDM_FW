@@ -87,6 +87,12 @@ public:
         return 0;
     };
 
+    Profet *pPrimary = nullptr;   // non-null if this output is a follower
+    Profet *pFollower = nullptr;  // non-null if this output is a primary with a follower
+
+    bool IsPwmEnabled() { return pwm.IsEnabled(); }
+    uint16_t GetFrequency() { return pConfig->stPwm.nFreq; }
+
     float fOutput;
     float fCurrent;
     float nOvercurrent;
@@ -123,4 +129,8 @@ private:
 
     Pwm pwm;
     uint16_t nPwmReadDelay = 0;
+
+    void FollowerUpdate();
+    void HandleDsel();
+    void CalculateCurrent();
 };

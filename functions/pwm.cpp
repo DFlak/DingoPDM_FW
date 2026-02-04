@@ -76,12 +76,22 @@ void Pwm::UpdateFrequency()
 
 msg_t Pwm::Init()
 {
-    msg_t ret;
-    ret = pwmStart(m_pwm, m_pwmCfg);
-    if (ret != HAL_RET_SUCCESS)
-        return ret;
+    return pwmStart(m_pwm, m_pwmCfg);
+}
 
-    return HAL_RET_SUCCESS;
+void Pwm::EnsureStarted()
+{
+    if (m_pwm->state != PWM_READY)
+        Init();
+}
+
+void Pwm::OverrideFrequency(uint16_t nFreq)
+{
+    if (nFreq > 0 && nFreq <= 400 &&
+        m_pwm->period != (m_pwmCfg->frequency / nFreq))
+    {
+        pwmChangePeriod(m_pwm, m_pwmCfg->frequency / nFreq);
+    }
 }
 
 void Pwm::On()

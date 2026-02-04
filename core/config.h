@@ -6,7 +6,7 @@
 #include "hardware/mb85rc.h"
 #include "dbc.h"
 
-#define CONFIG_VERSION 0x0003 //Increment when config structure changes
+#define CONFIG_VERSION 0x0004 //Increment when config structure changes
 
 struct Config_DeviceConfig{
   uint16_t nConfigVersion;
@@ -57,6 +57,7 @@ struct Config_Output{
   ProfetResetMode eResetMode;
   uint16_t nResetTime; //ms
   uint8_t nResetLimit;
+  int8_t nPrimaryOutput;  //index of primary to follow, -1 = unpaired
 
   Config_PwmOutput stPwm;
 };
