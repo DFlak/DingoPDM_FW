@@ -109,7 +109,9 @@
     {0x1600 + (i), 6,  &stConfig.stCounter[i].eIncEdge,    ParamType::Enum,   static_cast<float>(InputEdge::Rising), 0, 2}, \
     {0x1600 + (i), 7,  &stConfig.stCounter[i].eDecEdge,    ParamType::Enum,   static_cast<float>(InputEdge::Rising), 0, 2}, \
     {0x1600 + (i), 8,  &stConfig.stCounter[i].eResetEdge,  ParamType::Enum,   static_cast<float>(InputEdge::Rising), 0, 2}, \
-    {0x1600 + (i), 9,  &stConfig.stCounter[i].bWrapAround, ParamType::Bool,   0, 0, 1}
+    {0x1600 + (i), 9,  &stConfig.stCounter[i].bWrapAround, ParamType::Bool,   0, 0, 1}, \
+    {0x1600 + (i), 10, &stConfig.stCounter[i].bHoldToReset, ParamType::Bool,   0, 0, 1}, \
+    {0x1600 + (i), 11, &stConfig.stCounter[i].nResetTime,   ParamType::UInt16, 2000, 0, 10000}
 
 //=============================================================================
 // Flasher Parameters - Base 0x1700

@@ -37,4 +37,7 @@ private:
     bool bLastInc;
     bool bLastDec;
     bool bLastReset;
+    
+    uint32_t nLastIncTime;
+    uint32_t nLastDecTime;
 };

@@ -10,12 +10,30 @@ void Counter::Update()
         return;
     }
 
+    // Reset
     if (Edge::Check(pConfig->eResetEdge, bLastReset, *pResetInput))
     {
         fVal = 0;
         return;
     }
 
+    // Hold to reset
+    if (pConfig->bHoldToReset)
+    {
+        if (*pIncInput && (SYS_TIME - nLastIncTime >= pConfig->nResetTime))
+        {
+            fVal = 0;
+            return;
+        }
+
+        if (*pDecInput && (SYS_TIME - nLastDecTime >= pConfig->nResetTime))
+        {
+            fVal = 0;
+            return;
+        }
+    }
+
+    // Increment
     if (Edge::Check(pConfig->eIncEdge, bLastInc, *pIncInput))
     {
         fVal++;
@@ -23,8 +41,11 @@ void Counter::Update()
         {
             fVal = pConfig->bWrapAround ? 0 : pConfig->nMaxCount;
         }
+
+        nLastIncTime = SYS_TIME;
     }
 
+    // Decrement
     if (Edge::Check(pConfig->eDecEdge, bLastDec, *pDecInput))
     {
         if(fVal == 0)
@@ -35,6 +56,8 @@ void Counter::Update()
         {
             fVal--;
         }
+
+        nLastDecTime = SYS_TIME;
     }
 
     bLastInc = *pIncInput;

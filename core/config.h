@@ -124,6 +124,8 @@ struct Config_Counter{
   InputEdge eDecEdge;
   InputEdge eResetEdge;
   bool bWrapAround;
+  bool bHoldToReset;
+  uint16_t nResetTime; //ms
 };
 
 struct Config_Condition{
