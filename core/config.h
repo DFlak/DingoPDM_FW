@@ -113,6 +113,7 @@ struct Config_CanInput{
 struct Config_CanOutput{
   bool bEnabled;
   uint16_t nInput;
+  uint8_t nIDE; //0=STD, 1=EXT
   uint16_t nSID; // 11-bit standard ID (0x000-0x7FF)
   uint32_t nEID; // 29-bit extended ID
   uint8_t nStartBit;   
@@ -191,7 +192,7 @@ struct PdmConfig{
   Config_Flasher stFlasher[PDM_NUM_FLASHERS];
   Config_Starter stStarter;
   Config_CanInput stCanInput[PDM_NUM_CAN_INPUTS];
-  Config_CanOutput stCanOutput;
+  Config_CanOutput stCanOutput[PDM_NUM_CAN_OUTPUTS];
   Config_Counter stCounter[PDM_NUM_COUNTERS];
   Config_Condition stCondition[PDM_NUM_CONDITIONS];
   Config_Keypad stKeypad[PDM_NUM_KEYPADS];

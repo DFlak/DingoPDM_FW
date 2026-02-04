@@ -169,17 +169,19 @@
 //=============================================================================
 // CAN Output Parameters - Base 0x2000
 //=============================================================================
-#define CAN_OUTPUT_PARAMS() \
-    {0x2000, 0, &stConfig.stCanOutput.bEnabled, ParamType::Bool, 0, 0, 1}, \
-    {0x2000, 1, &stConfig.stCanOutput.nSID, ParamType::UInt16, 0x7D0, 0, 0x7FF}, \
-    {0x2000, 2, &stConfig.stCanOutput.nEID, ParamType::UInt32, 0, 0, 536870911.0f}, \
-    {0x2000, 3, &stConfig.stCanOutput.nStartBit, ParamType::UInt8, 0, 0, 63}, \
-    {0x2000, 4, &stConfig.stCanOutput.nBitLength, ParamType::UInt8, 0, 0, 8}, \
-    {0x2000, 5, &stConfig.stCanOutput.fFactor, ParamType::Float, 1.0f, 0.0f, 1e9f}, \
-    {0x2000, 6, &stConfig.stCanOutput.fOffset, ParamType::Float, 0.0f, -1e9f, 1e9f}, \
-    {0x2000, 7, &stConfig.stCanOutput.eByteOrder, ParamType::Enum, static_cast<float>(ByteOrder::LittleEndian), 0, 1}, \
-    {0x2000, 8, &stConfig.stCanOutput.bSigned, ParamType::Bool, 0, 0, 1}, \
-    {0x2000, 9, &stConfig.stCanOutput.nInterval, ParamType::UInt16, 1000, 0, 60000}
+#define CAN_OUTPUT_PARAMS(i) \
+    {0x2000 + (i), 0,  &stConfig.stCanOutput[i].bEnabled,    ParamType::Bool,   0, 0, 1}, \
+    {0x2000 + (i), 1,  &stConfig.stCanOutput[i].nInput,      ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x2000 + (i), 2,  &stConfig.stCanOutput[i].nIDE,        ParamType::UInt8,  0, 0, 1}, \
+    {0x2000 + (i), 3,  &stConfig.stCanOutput[i].nSID,        ParamType::UInt16, 0x7D0, 0, 0x7FF}, \
+    {0x2000 + (i), 4,  &stConfig.stCanOutput[i].nEID,        ParamType::UInt32, 0, 0, 536870911.0f}, \
+    {0x2000 + (i), 5,  &stConfig.stCanOutput[i].nStartBit,   ParamType::UInt8,  0, 0, 63}, \
+    {0x2000 + (i), 6,  &stConfig.stCanOutput[i].nBitLength,  ParamType::UInt8,  8, 1, 32}, \
+    {0x2000 + (i), 7,  &stConfig.stCanOutput[i].fFactor,     ParamType::Float,  1.0f, 0.0f, 1e9f}, \
+    {0x2000 + (i), 8,  &stConfig.stCanOutput[i].fOffset,     ParamType::Float,  0.0f, -1e9f, 1e9f}, \
+    {0x2000 + (i), 9,  &stConfig.stCanOutput[i].eByteOrder,  ParamType::Enum,   static_cast<float>(ByteOrder::LittleEndian), 0, 1}, \
+    {0x2000 + (i), 10, &stConfig.stCanOutput[i].bSigned,     ParamType::Bool,   0, 0, 1}, \
+    {0x2000 + (i), 11, &stConfig.stCanOutput[i].nInterval,   ParamType::UInt16, 1000, 0, 60000}
 
 //=============================================================================
 // Keypad Parameters - Base 0x3000

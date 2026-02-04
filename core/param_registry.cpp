@@ -10,8 +10,8 @@ const ParamInfo stParams[] = {
     // Device Config (0x0000)
     DEVICE_CONFIG_PARAMS(),
 
-    // CAN Output (0x0010)
-    CAN_OUTPUT_PARAMS(),
+    // CAN Outputs (0x2000+)
+    ALL_CAN_OUTPUT_PARAMS,
 
     // Outputs (0x1000+)
     ALL_OUTPUT_PARAMS,
@@ -43,7 +43,7 @@ const ParamInfo stParams[] = {
     WIPER_SPEED_MAP_PARAMS(),
     WIPER_INTERMIT_PARAMS(),
 
-    // Keypads (0x2000+)
+    // Keypads (0x3000+)
     ALL_KEYPAD_PARAMS,
 
     // Keypad Buttons (0x2100+)

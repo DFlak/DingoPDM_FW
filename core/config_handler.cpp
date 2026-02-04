@@ -3,6 +3,7 @@
 #include "dingopdm_config.h"
 #include "can.h"
 #include "can_input.h"
+#include "can_output.h"
 #include "counter.h"
 #include "condition.h"
 #include "digital.h"
@@ -16,6 +17,7 @@
 extern PdmConfig stConfig;
 extern Digital in[PDM_NUM_INPUTS];
 extern CanInput canIn[PDM_NUM_CAN_INPUTS];
+extern CanOutput canOut[PDM_NUM_CAN_OUTPUTS];
 extern VirtualInput virtIn[PDM_NUM_VIRT_INPUTS];
 extern Profet pf[PDM_NUM_OUTPUTS];
 extern Wiper wiper;
@@ -29,6 +31,7 @@ void ApplyAllConfig()
 {
     ApplyConfig(Digital::nBaseIndex);
     ApplyConfig(CanInput::nBaseIndex);
+    ApplyConfig(CanOutput::nBaseIndex);
     ApplyConfig(VirtualInput::nBaseIndex);
     ApplyConfig(Profet::nBaseIndex);
     ApplyConfig(Wiper::nBaseIndex);
@@ -81,6 +84,14 @@ void ApplyConfig(uint16_t nIndex)
         }
 
         //TODO: Set can filter without requiring reset, need a new message to indicate all IDs set before stopping CAN
+    }
+
+    if (nBaseIndex == CanOutput::nBaseIndex)
+    {
+        for (uint8_t i = 0; i < PDM_NUM_CAN_OUTPUTS; i++)
+            canOut[i].SetConfig(&stConfig.stCanOutput[i], i);
+
+        CanOutput::InitAllFrames();
     }
 
     if (nBaseIndex == VirtualInput::nBaseIndex)

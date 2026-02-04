@@ -239,7 +239,7 @@ void CyclicUpdate()
         canIn[i].CheckTimeout();
 
     for (uint8_t i = 0; i < PDM_NUM_CAN_OUTPUTS; i++)
-        canOut[i].CheckTime();
+        canOut[i].Update();
 
     for (uint8_t i = 0; i < PDM_NUM_VIRT_INPUTS; i++)
         virtIn[i].Update();
