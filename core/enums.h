@@ -2,6 +2,40 @@
 
 #include <cstdint>
 
+//=============================================================================
+// System State
+//=============================================================================
+enum class PdmState : uint8_t
+{
+    Run,
+    Sleep,
+    OverTemp,
+    Error
+};
+
+enum class FatalErrorType : uint8_t
+{
+    NoError = 0,
+    ErrIWDG,
+    ErrMailbox,
+    ErrTask,
+    ErrConfig,
+    ErrFRAM,
+    ErrADC,
+    ErrTempSensor,
+    ErrUSB,
+    ErrCAN,
+    ErrCRC,
+    ErrI2C,
+    ErrRCC,
+    ErrTemp,
+    ErrPwm,
+    ErrVarMap
+};
+
+//=============================================================================
+// Message Enums
+//=============================================================================
 enum class MsgCmd : uint8_t
 {
     Null = 0,
@@ -24,24 +58,27 @@ enum class MsgType : uint8_t
 
 enum class MsgSrc : uint8_t
 {
-  State_Run = 1,
-  State_Sleep,
-  State_Overtemp,
-  State_Error,
-  Overcurrent,
-  Voltage,
-  CAN,
-  USB,
-  Overtemp,
-  Config,
-  FRAM,
-  Analog,
-  I2C,
-  TempSensor,
-  USBConnection,
-  Init
- };
+    State_Run = 1,
+    State_Sleep,
+    State_Overtemp,
+    State_Error,
+    Overcurrent,
+    Voltage,
+    CAN,
+    USB,
+    Overtemp,
+    Config,
+    FRAM,
+    Analog,
+    I2C,
+    TempSensor,
+    USBConnection,
+    Init
+};
 
+//=============================================================================
+// Logic Operators
+//=============================================================================
 enum class Operator : uint8_t
 {
     Equal,
@@ -61,6 +98,9 @@ enum class BoolOperator : uint8_t
     Nor
 };
 
+//=============================================================================
+// CAN
+//=============================================================================
 enum class CanBitrate : uint8_t
 {
     Bitrate_1000K,
@@ -69,6 +109,9 @@ enum class CanBitrate : uint8_t
     Bitrate_125K
 };
 
+//=============================================================================
+// Input
+//=============================================================================
 enum class InputMode : uint8_t
 {
     Momentary,
@@ -89,14 +132,9 @@ enum class InputPull : uint8_t
     Down
 };
 
-enum class PdmState : uint8_t
-{
-    Run,
-    Sleep,
-    OverTemp,
-    Error
-};
-
+//=============================================================================
+// Output (Profet)
+//=============================================================================
 enum class ProfetModel : uint8_t
 {
     BTS7002_1EPP,
@@ -120,6 +158,20 @@ enum class ProfetResetMode : uint8_t
     Endless
 };
 
+//=============================================================================
+// PWM
+//=============================================================================
+enum class PwmChannel : uint8_t
+{
+    Ch1 = 0,
+    Ch2 = 1,
+    Ch3 = 2,
+    Ch4 = 3
+};
+
+//=============================================================================
+// Wiper
+//=============================================================================
 enum class WiperMode : uint8_t
 {
     DigIn = 0,
@@ -159,34 +211,9 @@ enum class MotorSpeed : uint8_t
     Fast = 2
 };
 
-enum class FatalErrorType : uint8_t
-{
-  NoError = 0,
-  ErrIWDG,
-  ErrMailbox,
-  ErrTask,
-  ErrConfig,
-  ErrFRAM,
-  ErrADC,
-  ErrTempSensor,
-  ErrUSB,
-  ErrCAN,
-  ErrCRC,
-  ErrI2C,
-  ErrRCC,
-  ErrTemp,
-  ErrPwm,
-  ErrVarMap
-};
-
-enum class PwmChannel : uint8_t
-{
-    Ch1 = 0,
-    Ch2 = 1,
-    Ch3 = 2,
-    Ch4 = 3
-};
-
+//=============================================================================
+// Keypad
+//=============================================================================
 enum class KeypadModel : uint8_t
 {
     Blink2Key,
@@ -223,7 +250,7 @@ enum class BlinkMarineBacklightColor : uint8_t
     Red = 0x01,
     Green = 0x02,
     Blue = 0x03,
-    Yellow = 0x04, 
+    Yellow = 0x04,
     Cyan = 0x05,
     Violet = 0x06,
     White = 0x07,

@@ -30,7 +30,7 @@
     {0x1000 + (i), 2,  &stConfig.stOutput[i].fCurrentLimit,                 ParamType::Float,  20.0f, 0.0f, 100.0f}, \
     {0x1000 + (i), 3,  &stConfig.stOutput[i].fInrushLimit,                  ParamType::Float,  50.0f, 0.0f, 100.0f}, \
     {0x1000 + (i), 4,  &stConfig.stOutput[i].nInrushTime,                   ParamType::UInt16, 100, 0, 10000}, \
-    {0x1000 + (i), 5,  &stConfig.stOutput[i].eResetMode,                    ParamType::Enum,   static_cast<float>(ResetMode::None), 0, 2}, \
+    {0x1000 + (i), 5,  &stConfig.stOutput[i].eResetMode,                    ParamType::Enum,   static_cast<float>(ProfetResetMode::None), 0, 2}, \
     {0x1000 + (i), 6,  &stConfig.stOutput[i].nResetTime,                    ParamType::UInt16, 1000, 0, 60000}, \
     {0x1000 + (i), 7,  &stConfig.stOutput[i].nResetLimit,                   ParamType::UInt8,  3, 0, 20}, \
     {0x1000 + (i), 8,  &stConfig.stOutput[i].stPwm.bEnabled,                ParamType::Bool,   0, 0, 1}, \
@@ -106,9 +106,9 @@
     {0x1600 + (i), 3,  &stConfig.stCounter[i].nResetInput, ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
     {0x1600 + (i), 4,  &stConfig.stCounter[i].nMinCount,   ParamType::UInt8,  0, 0, 255}, \
     {0x1600 + (i), 5,  &stConfig.stCounter[i].nMaxCount,   ParamType::UInt8,  10, 0, 255}, \
-    {0x1600 + (i), 6,  &stConfig.stCounter[i].eIncEdge,    ParamType::Enum,   static_cast<float>(Edge::Rising), 0, 2}, \
-    {0x1600 + (i), 7,  &stConfig.stCounter[i].eDecEdge,    ParamType::Enum,   static_cast<float>(Edge::Rising), 0, 2}, \
-    {0x1600 + (i), 8,  &stConfig.stCounter[i].eResetEdge,  ParamType::Enum,   static_cast<float>(Edge::Rising), 0, 2}, \
+    {0x1600 + (i), 6,  &stConfig.stCounter[i].eIncEdge,    ParamType::Enum,   static_cast<float>(InputEdge::Rising), 0, 2}, \
+    {0x1600 + (i), 7,  &stConfig.stCounter[i].eDecEdge,    ParamType::Enum,   static_cast<float>(InputEdge::Rising), 0, 2}, \
+    {0x1600 + (i), 8,  &stConfig.stCounter[i].eResetEdge,  ParamType::Enum,   static_cast<float>(InputEdge::Rising), 0, 2}, \
     {0x1600 + (i), 9,  &stConfig.stCounter[i].bWrapAround, ParamType::Bool,   0, 0, 1}
 
 //=============================================================================
@@ -177,7 +177,7 @@
     {0x2000 + (i), 1,  &stConfig.stKeypad[i].nNodeId,                   ParamType::UInt8,  0, 0, 127}, \
     {0x2000 + (i), 2,  &stConfig.stKeypad[i].bTimeoutEnabled,           ParamType::Bool,   0, 0, 1}, \
     {0x2000 + (i), 3,  &stConfig.stKeypad[i].nTimeout,                  ParamType::UInt16, 1000, 0, 60000}, \
-    {0x2000 + (i), 4,  &stConfig.stKeypad[i].eModel,                    ParamType::Enum,   static_cast<float>(KeypadModel::), 0, 3}, \
+    {0x2000 + (i), 4,  &stConfig.stKeypad[i].eModel,                    ParamType::Enum,   static_cast<float>(KeypadModel::Blink12Key), 0, 3}, \
     {0x2000 + (i), 5,  &stConfig.stKeypad[i].nBacklightBrightness,      ParamType::UInt8,  100, 0, 100}, \
     {0x2000 + (i), 6,  &stConfig.stKeypad[i].nDimBacklightBrightness,   ParamType::UInt8, 50, 0, 100}, \
     {0x2000 + (i), 7,  &stConfig.stKeypad[i].nBacklightColor,           ParamType::UInt8,  0, 0, 255}, \
