@@ -63,7 +63,6 @@ void CanTxThread(void *)
                 msg.RTR = CAN_RTR_DATA;
                 canTryTransmitI(&CAND1, CAN_ANY_MAILBOX, &msg);
                 // Returns true if mailbox full or nothing connected
-                // TODO: What to do if no tx?
 
                 chThdSleepMicroseconds(CAN_TX_MSG_SPLIT);
             }
@@ -105,7 +104,6 @@ void CanRxThread(void *)
             res = PostTxUsbFrame(&usbTx);
 
             palToggleLine(LINE_E2);
-            // TODO:What to do if mailbox is full?
         }
 
         if (chThdShouldTerminateX())

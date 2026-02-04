@@ -45,6 +45,12 @@ const ParamInfo stParams[] = {
 
     // Keypads (0x2000+)
     ALL_KEYPAD_PARAMS,
+
+    // Keypad Buttons (0x2100+)
+    ALL_KEYPAD_BUTTON_PARAMS,
+
+    // Keypad Dials (0x2200+)
+    ALL_KEYPAD_DIAL_PARAMS,
 };
 
 const uint16_t NUM_PARAMS = sizeof(stParams) / sizeof(stParams[0]);

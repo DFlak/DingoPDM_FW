@@ -11,15 +11,10 @@
 //=============================================================================
 #define DEVICE_CONFIG_PARAMS() \
     {0x0000, 0, &stConfig.stDevConfig.nConfigVersion,    ParamType::UInt16, CONFIG_VERSION, 0, 0xFFFF}, \
-    {0x0000, 1, &stConfig.stDevConfig.eCanSpeed,         ParamType::Enum,   static_cast<float>(CanBitrate::Bitrate_500K), 0, 4}, \
-    {0x0000, 2, &stConfig.stDevConfig.bSleepEnabled,     ParamType::Bool,   0, 0, 1}, \
-    {0x0000, 3, &stConfig.stDevConfig.bCanFilterEnabled, ParamType::Bool,   0, 0, 1}
-
-//=============================================================================
-// CAN Output Parameters - Base 0x0010
-//=============================================================================
-#define CAN_OUTPUT_PARAMS() \
-    {0x0010, 0, &stConfig.stCanOutput.nBaseId, ParamType::UInt16, 0x7D0, 0, 0x7FF}
+    {0x0010, 1, &stConfig.stDevConfig.nBaseId,           ParamType::UInt16, 0x7D0, 0, 0x7FF}, \
+    {0x0000, 2, &stConfig.stDevConfig.eCanSpeed,         ParamType::Enum,   static_cast<float>(CanBitrate::Bitrate_500K), 0, 4}, \
+    {0x0000, 3, &stConfig.stDevConfig.bSleepEnabled,     ParamType::Bool,   0, 0, 1}, \
+    {0x0000, 4, &stConfig.stDevConfig.bCanFilterEnabled, ParamType::Bool,   0, 0, 1}
 
 //=============================================================================
 // Output Parameters - Base 0x1000
@@ -172,17 +167,68 @@
     {0x1900, 25, &stConfig.stWiper.nIntermitTime[5], ParamType::UInt16, 6000, 0, 30000}
 
 //=============================================================================
-// Keypad Parameters - Base 0x2000
+// CAN Output Parameters - Base 0x2000
+//=============================================================================
+#define CAN_OUTPUT_PARAMS() \
+    {0x2000, 0, &stConfig.stCanOutput.bEnabled, ParamType::Bool, 0, 0, 1}, \
+    {0x2000, 1, &stConfig.stCanOutput.nSID, ParamType::UInt16, 0x7D0, 0, 0x7FF}, \
+    {0x2000, 2, &stConfig.stCanOutput.nEID, ParamType::UInt32, 0, 0, 536870911.0f}, \
+    {0x2000, 3, &stConfig.stCanOutput.nStartBit, ParamType::UInt8, 0, 0, 63}, \
+    {0x2000, 4, &stConfig.stCanOutput.nBitLength, ParamType::UInt8, 0, 0, 8}, \
+    {0x2000, 5, &stConfig.stCanOutput.fFactor, ParamType::Float, 1.0f, 0.0f, 1e9f}, \
+    {0x2000, 6, &stConfig.stCanOutput.fOffset, ParamType::Float, 0.0f, -1e9f, 1e9f}, \
+    {0x2000, 7, &stConfig.stCanOutput.eByteOrder, ParamType::Enum, static_cast<float>(ByteOrder::LittleEndian), 0, 1}, \
+    {0x2000, 8, &stConfig.stCanOutput.bSigned, ParamType::Bool, 0, 0, 1}, \
+    {0x2000, 9, &stConfig.stCanOutput.nInterval, ParamType::UInt16, 1000, 0, 60000}
+
+//=============================================================================
+// Keypad Parameters - Base 0x3000
 //=============================================================================
 #define KEYPAD_BASE_PARAMS(i) \
-    {0x2000 + (i), 0,  &stConfig.stKeypad[i].bEnabled,                  ParamType::Bool,   0, 0, 1}, \
-    {0x2000 + (i), 1,  &stConfig.stKeypad[i].nNodeId,                   ParamType::UInt8,  0, 0, 127}, \
-    {0x2000 + (i), 2,  &stConfig.stKeypad[i].bTimeoutEnabled,           ParamType::Bool,   0, 0, 1}, \
-    {0x2000 + (i), 3,  &stConfig.stKeypad[i].nTimeout,                  ParamType::UInt16, 1000, 0, 60000}, \
-    {0x2000 + (i), 4,  &stConfig.stKeypad[i].eModel,                    ParamType::Enum,   static_cast<float>(KeypadModel::Blink12Key), 0, 3}, \
-    {0x2000 + (i), 5,  &stConfig.stKeypad[i].nBacklightBrightness,      ParamType::UInt8,  100, 0, 100}, \
-    {0x2000 + (i), 6,  &stConfig.stKeypad[i].nDimBacklightBrightness,   ParamType::UInt8, 50, 0, 100}, \
-    {0x2000 + (i), 7,  &stConfig.stKeypad[i].nBacklightColor,           ParamType::UInt8,  0, 0, 255}, \
-    {0x2000 + (i), 8,  &stConfig.stKeypad[i].nDimmingVar,               ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
-    {0x2000 + (i), 9,  &stConfig.stKeypad[i].nButtonBrightness,         ParamType::UInt8,  100, 0, 100}, \
-    {0x2000 + (i), 10, &stConfig.stKeypad[i].nDimButtonBrightness,      ParamType::UInt8,  50, 0, 100}
+    {0x3000 + (i), 0,  &stConfig.stKeypad[i].bEnabled,                  ParamType::Bool,   0, 0, 1}, \
+    {0x3000 + (i), 1,  &stConfig.stKeypad[i].nNodeId,                   ParamType::UInt8,  0, 0, 127}, \
+    {0x3000 + (i), 2,  &stConfig.stKeypad[i].bTimeoutEnabled,           ParamType::Bool,   0, 0, 1}, \
+    {0x3000 + (i), 3,  &stConfig.stKeypad[i].nTimeout,                  ParamType::UInt16, 1000, 0, 60000}, \
+    {0x3000 + (i), 4,  &stConfig.stKeypad[i].eModel,                    ParamType::Enum,   static_cast<float>(KeypadModel::Blink12Key), 0, 13}, \
+    {0x3000 + (i), 5,  &stConfig.stKeypad[i].nBacklightBrightness,      ParamType::UInt8,  100, 0, 100}, \
+    {0x3000 + (i), 6,  &stConfig.stKeypad[i].nDimBacklightBrightness,   ParamType::UInt8,  50, 0, 100}, \
+    {0x3000 + (i), 7,  &stConfig.stKeypad[i].nBacklightColor,           ParamType::UInt8,  0, 0, 9}, \
+    {0x3000 + (i), 8,  &stConfig.stKeypad[i].nDimmingVar,               ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3000 + (i), 9,  &stConfig.stKeypad[i].nButtonBrightness,         ParamType::UInt8,  100, 0, 100}, \
+    {0x3000 + (i), 10, &stConfig.stKeypad[i].nDimButtonBrightness,      ParamType::UInt8,  50, 0, 100}
+
+//=============================================================================
+// Keypad Button Parameters - Base 0x3100 + (keypad * 32) + button
+//=============================================================================
+#define KEYPAD_BUTTON_PARAMS(k, b) \
+    {0x3100 + (k) * 32 + (b), 0,  &stConfig.stKeypad[k].stButton[b].bEnabled,              ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 1,  &stConfig.stKeypad[k].stButton[b].eMode,                 ParamType::Enum,   static_cast<float>(InputMode::Momentary), 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 2,  &stConfig.stKeypad[k].stButton[b].nNumOfValColors,       ParamType::UInt8,  1, 0, 4}, \
+    {0x3100 + (k) * 32 + (b), 3,  &stConfig.stKeypad[k].stButton[b].nValColors[0],         ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 4,  &stConfig.stKeypad[k].stButton[b].nValColors[1],         ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 5,  &stConfig.stKeypad[k].stButton[b].nValColors[2],         ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 6,  &stConfig.stKeypad[k].stButton[b].nValColors[3],         ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 7,  &stConfig.stKeypad[k].stButton[b].nFaultColor,           ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 8,  &stConfig.stKeypad[k].stButton[b].nValVars[0],           ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 9,  &stConfig.stKeypad[k].stButton[b].nValVars[1],           ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 10, &stConfig.stKeypad[k].stButton[b].nValVars[2],           ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 11, &stConfig.stKeypad[k].stButton[b].nValVars[3],           ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 12, &stConfig.stKeypad[k].stButton[b].nFaultVar,             ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 13, &stConfig.stKeypad[k].stButton[b].bValBlinking[0],       ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 14, &stConfig.stKeypad[k].stButton[b].bValBlinking[1],       ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 15, &stConfig.stKeypad[k].stButton[b].bValBlinking[2],       ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 16, &stConfig.stKeypad[k].stButton[b].bValBlinking[3],       ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 17, &stConfig.stKeypad[k].stButton[b].bFaultBlinking,        ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 18, &stConfig.stKeypad[k].stButton[b].nValBlinkingColors[0], ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 19, &stConfig.stKeypad[k].stButton[b].nValBlinkingColors[1], ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 20, &stConfig.stKeypad[k].stButton[b].nValBlinkingColors[2], ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 21, &stConfig.stKeypad[k].stButton[b].nValBlinkingColors[3], ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 22, &stConfig.stKeypad[k].stButton[b].nFaultBlinkingColor,   ParamType::UInt8,  0, 0, 7}
+
+//=============================================================================
+// Keypad Dial Parameters - Base 0x3200 + (keypad * 4) + dial
+//=============================================================================
+#define KEYPAD_DIAL_PARAMS(k, d) \
+    {0x3200 + (k) * 4 + (d), 0, &stConfig.stKeypad[k].stDial[d].nDialMinLed,    ParamType::UInt8, 0, 0, 255}, \
+    {0x3200 + (k) * 4 + (d), 1, &stConfig.stKeypad[k].stDial[d].nDialMaxLed,    ParamType::UInt8, 0, 0, 255}, \
+    {0x3200 + (k) * 4 + (d), 2, &stConfig.stKeypad[k].stDial[d].nDialLedOffset, ParamType::UInt8, 0, 0, 255}

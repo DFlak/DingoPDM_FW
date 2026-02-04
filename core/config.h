@@ -10,6 +10,7 @@
 
 struct Config_DeviceConfig{
   uint16_t nConfigVersion;
+  uint16_t nBaseId;
   CanBitrate eCanSpeed;
   bool bSleepEnabled;
   bool bCanFilterEnabled;
@@ -110,7 +111,17 @@ struct Config_CanInput{
 };
 
 struct Config_CanOutput{
-  uint16_t nBaseId;
+  bool bEnabled;
+  uint16_t nInput;
+  uint16_t nSID; // 11-bit standard ID (0x000-0x7FF)
+  uint32_t nEID; // 29-bit extended ID
+  uint8_t nStartBit;   
+  uint8_t nBitLength;  
+  float fFactor;       
+  float fOffset;       
+  ByteOrder eByteOrder;
+  bool bSigned;
+  uint16_t nInterval; //ms
 };
 
 struct Config_Counter{

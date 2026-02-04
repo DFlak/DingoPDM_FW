@@ -24,18 +24,18 @@ extern Profet pf[PDM_NUM_OUTPUTS];
 
 void SendInfoMsgs()
 {
-    StateRunMsg.Check(eState == PdmState::Run, stConfig.stCanOutput.nBaseId, 0, 0, 0);
-    StateSleepMsg.Check(eState == PdmState::Sleep, stConfig.stCanOutput.nBaseId, 0, 0, 0);
-    StateOvertempMsg.Check(eState == PdmState::OverTemp, stConfig.stCanOutput.nBaseId, GetBoardTemp() * 10, 0, 0);
-    StateErrorMsg.Check(eState == PdmState::Error, stConfig.stCanOutput.nBaseId, GetBoardTemp() * 10, GetTotalCurrent() * 10, 0);
+    StateRunMsg.Check(eState == PdmState::Run, stConfig.stDevConfig.nBaseId, 0, 0, 0);
+    StateSleepMsg.Check(eState == PdmState::Sleep, stConfig.stDevConfig.nBaseId, 0, 0, 0);
+    StateOvertempMsg.Check(eState == PdmState::OverTemp, stConfig.stDevConfig.nBaseId, GetBoardTemp() * 10, 0, 0);
+    StateErrorMsg.Check(eState == PdmState::Error, stConfig.stDevConfig.nBaseId, GetBoardTemp() * 10, GetTotalCurrent() * 10, 0);
 
-    BattOvervoltageMsg.Check(fBattVolt > BATT_HIGH_VOLT, stConfig.stCanOutput.nBaseId, fBattVolt * 10, 0, 0);
-    BattUndervoltageMsg.Check(fBattVolt < BATT_LOW_VOLT, stConfig.stCanOutput.nBaseId, fBattVolt * 10, 0, 0);
+    BattOvervoltageMsg.Check(fBattVolt > BATT_HIGH_VOLT, stConfig.stDevConfig.nBaseId, fBattVolt * 10, 0, 0);
+    BattUndervoltageMsg.Check(fBattVolt < BATT_LOW_VOLT, stConfig.stDevConfig.nBaseId, fBattVolt * 10, 0, 0);
 
     for (uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
     {
-        OutputOvercurrentMsg[i].Check(GetOutputState(i) == ProfetState::Overcurrent, stConfig.stCanOutput.nBaseId, i, GetOutputCurrent(i), 0);
-        OutputFaultMsg[i].Check(GetOutputState(i) == ProfetState::Fault, stConfig.stCanOutput.nBaseId, i, GetOutputCurrent(i), 0);
+        OutputOvercurrentMsg[i].Check(GetOutputState(i) == ProfetState::Overcurrent, stConfig.stDevConfig.nBaseId, i, GetOutputCurrent(i), 0);
+        OutputFaultMsg[i].Check(GetOutputState(i) == ProfetState::Fault, stConfig.stDevConfig.nBaseId, i, GetOutputCurrent(i), 0);
     }
 }
 

@@ -24,7 +24,7 @@ void EncodeParamRsp(CANTxFrame *tx, uint8_t cmd, uint16_t index, uint8_t subinde
     tx->RTR = 0;
     tx->DLC = 8;
 
-    tx->SID = stConfig.stCanOutput.nBaseId + TX_SETTINGS_ID_OFFSET;
+    tx->SID = stConfig.stDevConfig.nBaseId + TX_SETTINGS_ID_OFFSET;
 
     tx->data8[0] = cmd;
     tx->data8[1] = index & 0xFF;
@@ -68,7 +68,7 @@ void ProcessParamMsg(CANRxFrame *rx) {
     CANTxFrame tx;
     ParamMsg msg;
 
-    if (rx->SID != stConfig.stCanOutput.nBaseId - 1)
+    if (rx->SID != stConfig.stDevConfig.nBaseId - 1)
         return;
 
     msg.eCmd = static_cast<MsgCmd>(rx->data8[0]);

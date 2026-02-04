@@ -15,7 +15,7 @@ extern bool bSleepRequest;
 void CheckRequestMsgs(CANRxFrame *frame)
 {
     //Check for settings request message, (Base ID - 1)
-    if(frame->SID != (stConfig.stCanOutput.nBaseId - 1))
+    if(frame->SID != (stConfig.stDevConfig.nBaseId - 1))
         return;
 
     // Check for sleep request
@@ -25,7 +25,7 @@ void CheckRequestMsgs(CANRxFrame *frame)
         (frame->data8[3] == 'I') && (frame->data8[4] == 'T'))
     {
         CANTxFrame txMsg;
-        txMsg.SID = stConfig.stCanOutput.nBaseId + TX_SETTINGS_ID_OFFSET;
+        txMsg.SID = stConfig.stDevConfig.nBaseId + TX_SETTINGS_ID_OFFSET;
         txMsg.IDE = CAN_IDE_STD;
         txMsg.DLC = 2;
         txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::Sleep) + 128;
@@ -44,7 +44,7 @@ void CheckRequestMsgs(CANRxFrame *frame)
         (frame->data8[3] == 8))
     {
         CANTxFrame txMsg;
-        txMsg.SID = stConfig.stCanOutput.nBaseId + TX_SETTINGS_ID_OFFSET;
+        txMsg.SID = stConfig.stDevConfig.nBaseId + TX_SETTINGS_ID_OFFSET;
         txMsg.IDE = CAN_IDE_STD;
         txMsg.DLC = 2;
         txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::BurnSettings) + 128;
@@ -67,7 +67,7 @@ void CheckRequestMsgs(CANRxFrame *frame)
         (frame->data8[0] == static_cast<uint8_t>(MsgCmd::Version)))
     {
         CANTxFrame txMsg;
-        txMsg.SID = stConfig.stCanOutput.nBaseId + TX_SETTINGS_ID_OFFSET;
+        txMsg.SID = stConfig.stDevConfig.nBaseId + TX_SETTINGS_ID_OFFSET;
         txMsg.IDE = CAN_IDE_STD;
         txMsg.DLC = 5;
         txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::Version) + 128;

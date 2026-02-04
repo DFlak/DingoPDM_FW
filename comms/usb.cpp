@@ -421,7 +421,7 @@ void UsbRxThread(void *)
                     msg.DLC++;
                 }
 
-                msg.SID = stConfig.stCanOutput.nBaseId - 1;
+                msg.SID = stConfig.stDevConfig.nBaseId - 1;
 
                 PostRxFrame(&msg);
                 // TODO:What to do if mailbox is full?

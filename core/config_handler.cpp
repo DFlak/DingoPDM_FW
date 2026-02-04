@@ -63,7 +63,7 @@ void ApplyConfig(uint16_t nIndex)
 
         // Set filter for CAN settings request message, (Base ID - 1)
         // Use filter 0, it is always enabled to allow all messages by hal so it must be used
-        SetCanFilterId(0, stConfig.stCanOutput.nBaseId - 1, false);
+        SetCanFilterId(0, stConfig.stDevConfig.nBaseId - 1, false);
 
         for (uint8_t i = 0; i < PDM_NUM_CAN_INPUTS; i++)
         {
