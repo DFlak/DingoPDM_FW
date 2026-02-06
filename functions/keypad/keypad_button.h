@@ -5,10 +5,16 @@
 
 extern float *pVarMap[PDM_VAR_MAP_SIZE];
 
+class KeypadButton;
+
+// Function pointer types for brand-specific LED behavior
+using ButtonUpdateLedFn = void (*)(KeypadButton*);
+using ButtonGetLedStateFn = uint8_t (*)(KeypadButton*);  // Returns 0=off, 1=on, 2=blink
+
 class KeypadButton
 {
 public:
-    KeypadButton() {};
+    KeypadButton() = default;
 
     void SetConfig(Config_KeypadButton *config)
     {
@@ -20,24 +26,40 @@ public:
         pFaultLedVar = pVarMap[config->nFaultVar];
     }
 
-    static void SetDefaultConfig(Config_KeypadButton *config);
-    
+    void SetBrand(ButtonUpdateLedFn updateFn, ButtonGetLedStateFn stateFn)
+    {
+        fnUpdateLed = updateFn;
+        fnGetLedState = stateFn;
+    }
+
     bool Update(bool bNewVal);
 
-    void UpdateLed();
+    void UpdateLed()
+    {
+        if (fnUpdateLed)
+            fnUpdateLed(this);
+    }
 
-    //Bit 0 = Red
-    //Bit 1 = Green
-    //Bit 2 = Blue
-    BlinkMarineButtonColor eLedOnColor;
-    BlinkMarineButtonColor eLedBlinkColor;
+    uint8_t GetLedState()
+    {
+        if (fnGetLedState)
+            return fnGetLedState(this);
+        return 0;
+    }
+
+    // LED state - brand-specific code sets these
+    BlinkMarineButtonColor eLedOnColor = BlinkMarineButtonColor::Off;
+    BlinkMarineButtonColor eLedBlinkColor = BlinkMarineButtonColor::Off;
+
+    // Config accessible to brand-specific functions
+    Config_KeypadButton *pConfig = nullptr;
+    float *pLedVars[4] = {};
+    float *pFaultLedVar = nullptr;
 
 private:
-    Config_KeypadButton *pConfig;
     Input input;
+    bool bVal = false;
 
-    float *pLedVars[4];
-    float *pFaultLedVar;
-
-    bool bVal;
+    ButtonUpdateLedFn fnUpdateLed = nullptr;
+    ButtonGetLedStateFn fnGetLedState = nullptr;
 };

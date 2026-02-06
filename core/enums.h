@@ -44,6 +44,7 @@ enum class MsgCmd : uint8_t
     ReadAllParams = 3,
     ResetToDefaults = 4,
     BurnSettings = 5,
+    ParamResponse = 10,
     Version = 20,
     Sleep = 21,
     Bootloader = 22
@@ -216,20 +217,20 @@ enum class MotorSpeed : uint8_t
 //=============================================================================
 enum class KeypadModel : uint8_t
 {
-    Blink2Key,
-    Blink4Key,
-    Blink5Key,
-    Blink6Key,
-    Blink8Key,
-    Blink10Key,
-    Blink12Key,
-    Blink15Key,
-    Blink13Key2Dial,
-    BlinkRacepad,
-    Grayhill6Key,
-    Grayhill8Key,
-    Grayhill15Key,
-    Grayhill20Key
+    Blink2Key = 0,
+    Blink4Key = 1,
+    Blink5Key = 2,
+    Blink6Key = 3,
+    Blink8Key = 4,
+    Blink10Key = 5,
+    Blink12Key = 6,
+    Blink15Key = 7,
+    Blink13Key2Dial = 8,
+    BlinkRacepad = 9,
+    Grayhill6Key = 20,
+    Grayhill8Key = 21,
+    Grayhill15Key = 22,
+    Grayhill20Key = 23
 };
 
 enum class BlinkMarineButtonColor : uint8_t

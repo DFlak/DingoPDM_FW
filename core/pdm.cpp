@@ -124,8 +124,7 @@ void InitPdm()
     if (!tempSensor.Init(BOARD_TEMP_WARN, BOARD_TEMP_CRIT))
         Error::SetFatalError(FatalErrorType::ErrTempSensor, MsgSrc::Init);
 
-    for(uint8_t i = 0; i < PDM_NUM_KEYPADS; i++)
-        keypad[i].Init(i);
+    Keypad::InitThread(keypad);
 
     InitInfoMsgs();
 

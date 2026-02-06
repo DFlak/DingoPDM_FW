@@ -84,7 +84,7 @@ void ProcessParamMsg(CANRxFrame *rx) {
         const ParamInfo* param = FindParam(msg.nIndex, msg.nSubIndex);
         if (param) {
             uint32_t value = ReadParam(param);
-            EncodeParamRsp(&tx, static_cast<uint8_t>(msg.eCmd), msg.nIndex, msg.nSubIndex, value);
+            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ParamResponse), msg.nIndex, msg.nSubIndex, value);
             PostTxFrame(&tx);
             return;
         }
@@ -93,7 +93,7 @@ void ProcessParamMsg(CANRxFrame *rx) {
     if (msg.eCmd == MsgCmd::WriteParam) {
         const ParamInfo* param = FindParam(msg.nIndex, msg.nSubIndex);
         if (param && WriteParam(param, msg.nValue)) {
-            EncodeParamRsp(&tx, static_cast<uint8_t>(msg.eCmd), msg.nIndex, msg.nSubIndex, msg.nValue);
+            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ParamResponse), msg.nIndex, msg.nSubIndex, msg.nValue);
             PostTxFrame(&tx);
             return;
         }

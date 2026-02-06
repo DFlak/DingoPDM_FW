@@ -19,7 +19,7 @@ void CheckRequestMsgs(CANRxFrame *frame)
         return;
 
     // Check for sleep request
-    if ((frame->DLC == 5) && 
+    if ((frame->DLC == 8) && 
         (frame->data8[0] == static_cast<uint8_t>(MsgCmd::Sleep)) &&
         (frame->data8[1] == 'Q') && (frame->data8[2] == 'U') && 
         (frame->data8[3] == 'I') && (frame->data8[4] == 'T'))
@@ -37,7 +37,7 @@ void CheckRequestMsgs(CANRxFrame *frame)
     }
 
     // Check for burn request
-    if ((frame->DLC == 4) && 
+    if ((frame->DLC == 8) && 
         (frame->data8[0] == static_cast<uint8_t>(MsgCmd::BurnSettings)) &&
         (frame->data8[1] == 1) &&
         (frame->data8[2] == 3) && 

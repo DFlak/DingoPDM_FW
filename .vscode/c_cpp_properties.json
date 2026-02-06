@@ -104,6 +104,8 @@
                 "${workspaceFolder}/functions",
                 "${workspaceFolder}/functions/wiper",
                 "${workspaceFolder}/functions/keypad",
+                "${workspaceFolder}/functions/keypad/blink",
+                "${workspaceFolder}/functions/keypad/grayhill",
                 "${workspaceFolder}/utils",
                 "${workspaceFolder}/hardware",
                 "${workspaceFolder}/boards/dingopdm_v7",

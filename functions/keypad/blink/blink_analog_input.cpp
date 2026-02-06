@@ -1,6 +1,6 @@
-#include "keypad_analog_input.h"
+#include "blink_analog_input.h"
 
-bool KeypadAnalogInput::Update(uint16_t nRawVal)
+bool BlinkAnalogInput::Update(uint16_t nRawVal)
 {
     // Scale raw value (0-500) to 0-5.0V range
     fVal = (static_cast<float>(nRawVal) / 100.0f);

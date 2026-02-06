@@ -169,8 +169,13 @@ CPPSRC = $(ALLCPPSRC) \
 				 functions/wiper/wiper_intin.cpp \
 				 functions/wiper/wiper_mixin.cpp \
 				 functions/wiper/wiper.cpp \
+				 functions/keypad/blink/blink_button.cpp \
+				 functions/keypad/blink/blink_dial.cpp \
+				 functions/keypad/blink/blink_analog_input.cpp \
+				 functions/keypad/blink/blink_keypad.cpp \
+				 functions/keypad/grayhill/grayhill_button.cpp \
+				 functions/keypad/grayhill/grayhill_keypad.cpp \
 				 functions/keypad/keypad_button.cpp \
-				 functions/keypad/keypad_dial.cpp \
 				 functions/keypad/keypad.cpp \
 				 hardware/mcp9808.cpp \
 				 hardware/mb85rc.cpp \
@@ -213,6 +218,8 @@ UINCDIR = ./boards/$(MCU) \
 				  ./core \
 				  ./functions \
 				  ./functions/wiper \
+				  ./functions/keypad/blink \
+				  ./functions/keypad/grayhill \
 				  ./functions/keypad \
 				  ./hardware \
 				  ./utils \

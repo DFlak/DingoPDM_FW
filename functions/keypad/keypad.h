@@ -9,73 +9,53 @@
 
 extern float *pVarMap[PDM_VAR_MAP_SIZE];
 
+class Keypad;  // Forward declaration
+
+// Function pointer types for brand-specific behavior
+using KeypadCheckMsgFn = bool (*)(Keypad*, CANRxFrame);
+using KeypadGetTxMsgFn = CANTxFrame (*)(Keypad*, uint8_t);
+using KeypadGetStartMsgFn = CANTxFrame (*)(Keypad*);
+using KeypadSetModelFn = void (*)(Keypad*);
+
 class Keypad
 {
-public: 
-    Keypad() {};
+public:
+    Keypad() = default;
 
-    void SetConfig(Config_Keypad* config)
-    {
-        pConfig = config;
-        pDimmingInput = &pVarMap[config->nDimmingVar][0];
-        for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
-        {
-            button[i].SetConfig(&pConfig->stButton[i]);
-        }
-        for (uint8_t i = 0; i < KEYPAD_MAX_DIALS; i++)
-        {
-            dial[i].SetConfig(&pConfig->stDial[i]);
-        }
-    };
+    void SetConfig(Config_Keypad* config);
 
     static const uint16_t nBaseIndex = 0x2000;
 
-    msg_t Init(uint8_t index = 0);
+    static msg_t InitThread(Keypad *keypads);
 
+    bool IsEnabled() const { return pConfig->bEnabled; }
     void CheckTimeout();
 
     bool CheckMsg(CANRxFrame frame);
-
     CANTxFrame GetTxMsg(uint8_t nIndex);
     CANTxFrame GetStartMsg();
+    uint8_t GetNumTxMsgs() const { return nNumTxMsgs; }
 
+    // Var map data
     float fVal[KEYPAD_MAX_BUTTONS];
     float nDialVal[KEYPAD_MAX_DIALS];
     float fAnalogVal[KEYPAD_MAX_ANALOG_INPUTS];
 
-protected:
-    Config_Keypad* pConfig;
-
-    uint32_t nLastRxTime;
-
-    float *pDimmingInput;
-
+    Config_Keypad* pConfig = nullptr;
+    uint32_t nLastRxTime = 0;
+    float* pDimmingInput = nullptr;
     KeypadButton button[KEYPAD_MAX_BUTTONS];
-    
-
-    uint8_t nNumButtons;
-
-    void SetModel();
-    KeypadModel eLastModel;
-
-    // Blink Marine specific
-    CANTxFrame LedOnMsg();
-    CANTxFrame LedBlinkMsg();
-    CANTxFrame LedBrightnessMsg();
-    CANTxFrame BacklightMsg();
-
-    uint64_t BuildLedMsg(bool bBlink); 
-
-    bool ColorToRed(BlinkMarineButtonColor eColor);
-    bool ColorToGreen(BlinkMarineButtonColor eColor);
-    bool ColorToBlue(BlinkMarineButtonColor eColor);
-
     KeypadDial dial[KEYPAD_MAX_DIALS];
+    uint8_t nNumButtons = 0;
+    uint8_t nNumDials = 0;
 
-    uint8_t nNumDials;
+private:
+    KeypadModel eLastModel = KeypadModel::Blink2Key;
+    uint8_t nNumTxMsgs = 0;
 
-
-    // Grayhill specific
-    CANTxFrame IndicatorMsg();
-    CANTxFrame BrightnessMsg();
+    // Function pointers - set by SetConfig based on model
+    KeypadCheckMsgFn fnCheckMsg = nullptr;
+    KeypadGetTxMsgFn fnGetTxMsg = nullptr;
+    KeypadGetStartMsgFn fnGetStartMsg = nullptr;
+    KeypadSetModelFn fnSetModel = nullptr;
 };

@@ -2,10 +2,10 @@
 
 #include <cstdint>
 
-class KeypadAnalogInput
+class BlinkAnalogInput
 {
 public:
-    KeypadAnalogInput() {};
+    BlinkAnalogInput() {};
     
     bool Update(uint16_t nRawVal);
 
