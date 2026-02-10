@@ -39,15 +39,21 @@ enum class FatalErrorType : uint8_t
 enum class MsgCmd : uint8_t
 {
     Null = 0,
-    ReadParam = 1,
-    WriteParam = 2,
-    ReadAllParams = 3,
-    ResetToDefaults = 4,
-    BurnSettings = 5,
-    ParamResponse = 10,
-    Version = 20,
-    Sleep = 21,
-    Bootloader = 22
+    Read = 1,
+    Write = 2,
+
+    ReadAll = 10,
+    ReadAllRsp = 11,
+    ReadAllComplete = 12,
+
+    WriteAll = 20,
+    WriteAllVal = 21,
+    WriteAllComplete = 22,
+
+    BurnSettings = 30,
+    Version = 31,
+    Sleep = 32,
+    Bootloader = 33
 };
 
 enum class MsgType : uint8_t

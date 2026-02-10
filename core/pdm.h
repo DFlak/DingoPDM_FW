@@ -29,6 +29,7 @@ extern Condition condition[PDM_NUM_CONDITIONS];
 extern Keypad keypad[PDM_NUM_KEYPADS];
 
 extern PdmConfig stConfig;
+extern PdmConfig stConfigTemp; // Used for staging new config before applying
 extern float *pVarMap[PDM_VAR_MAP_SIZE];
 extern PdmState eState;
 extern float fTempSensor;

@@ -41,6 +41,7 @@ PdmState eState = PdmState::Run;
 float fState; //For var map
 FatalErrorType eError = FatalErrorType::NoError;
 PdmConfig stConfig;
+PdmConfig stConfigTemp; // Used for staging new config before applying
 float *pVarMap[PDM_VAR_MAP_SIZE];
 
 float fBattVolt;

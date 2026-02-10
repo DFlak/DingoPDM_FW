@@ -42,7 +42,7 @@ void SendAllNonDefaultParams() {
     for (int i = 0; i < NUM_PARAMS; i++) {
         if (!IsDefaultValue(&stParams[i])) {
             uint32_t value = ReadParam(&stParams[i]);
-            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ReadAllParams), 
+            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ReadAllRsp), 
                             stParams[i].nIndex, stParams[i].nSubIndex, value);
             PostTxFrame(&tx);
 
@@ -50,9 +50,13 @@ void SendAllNonDefaultParams() {
             chThdSleepMilliseconds(1);
         }
     }
+
+    chThdSleepMilliseconds(1);
+    EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ReadAllComplete), 0, 0, 0); // End of params marker
+    PostTxFrame(&tx);
 }
 
-void SetAllDefaultParams() {
+void SetAllDefaultParams(bool temp) {
     for (int i = 0; i < NUM_PARAMS; i++) {
         uint32_t defaultVal;
         if (stParams[i].eType == ParamType::Float) {
@@ -60,7 +64,14 @@ void SetAllDefaultParams() {
         } else {
             defaultVal = static_cast<uint32_t>(stParams[i].fDefaultVal);
         }
-        WriteParam(&stParams[i], defaultVal);
+        WriteParam(&stParams[i], defaultVal, temp);
+    }
+}
+
+void ApplyTempParams() {
+    for (int i = 0; i < NUM_PARAMS; i++) {
+            uint32_t tempVal = ReadParam(&stParams[i], true);
+            WriteParam(&stParams[i], tempVal, false);
     }
 }
 
@@ -73,35 +84,70 @@ void ProcessParamMsg(CANRxFrame *rx) {
 
     msg.eCmd = static_cast<MsgCmd>(rx->data8[0]);
 
-    if (!(msg.eCmd == MsgCmd::ReadParam || 
-        msg.eCmd == MsgCmd::WriteParam || 
-        msg.eCmd == MsgCmd::ReadAllParams))
+    if (!(msg.eCmd == MsgCmd::Read || 
+        msg.eCmd == MsgCmd::Write || 
+        msg.eCmd == MsgCmd::ReadAll ||
+        msg.eCmd == MsgCmd::ReadAllRsp ||
+        msg.eCmd == MsgCmd::ReadAllComplete ||
+        msg.eCmd == MsgCmd::WriteAll ||
+        msg.eCmd == MsgCmd::WriteAllVal ||
+        msg.eCmd == MsgCmd::WriteAllComplete))
         return;
 
     DecodeParamCmd(rx, &msg);
 
-    if (msg.eCmd == MsgCmd::ReadParam) {
+    if (msg.eCmd == MsgCmd::Read) {
         const ParamInfo* param = FindParam(msg.nIndex, msg.nSubIndex);
         if (param) {
             uint32_t value = ReadParam(param);
-            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ParamResponse), msg.nIndex, msg.nSubIndex, value);
+            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::Read), msg.nIndex, msg.nSubIndex, value);
             PostTxFrame(&tx);
             return;
         }
+        return;
     }
 
-    if (msg.eCmd == MsgCmd::WriteParam) {
+    if (msg.eCmd == MsgCmd::Write) {
         const ParamInfo* param = FindParam(msg.nIndex, msg.nSubIndex);
         if (param && WriteParam(param, msg.nValue)) {
-            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ParamResponse), msg.nIndex, msg.nSubIndex, msg.nValue);
+            uint32_t value = ReadParam(param, true);
+            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::Write), msg.nIndex, msg.nSubIndex, value);
             PostTxFrame(&tx);
             return;
         }
     }
 
-    if (msg.eCmd == MsgCmd::ReadAllParams) {
+    if (msg.eCmd == MsgCmd::ReadAll) {
+        EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ReadAll), 0, 0, 0); // Start of params marker
+        PostTxFrame(&tx);
+        chThdSleepMilliseconds(1);
         // Send multiple responses for non-default params
         SendAllNonDefaultParams();
+        return;
+    }
+
+    if (msg.eCmd == MsgCmd::WriteAll) {
+        SetAllDefaultParams(true); // Clear temp values
+        EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::WriteAll), 0, 0, 0); // Start of params marker
+        PostTxFrame(&tx);
+        return;
+    }
+
+    if (msg.eCmd == MsgCmd::WriteAllVal) {
+        const ParamInfo* param = FindParam(msg.nIndex, msg.nSubIndex);
+        if (param && WriteParam(param, msg.nValue, true)) {
+            uint32_t value = ReadParam(param, true);
+            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::Write), msg.nIndex, msg.nSubIndex, value);
+            PostTxFrame(&tx);
+            return;
+        }
+        return;
+    }
+
+    if (msg.eCmd == MsgCmd::WriteAllComplete) {
+        SetAllDefaultParams(false); // Apply temp values
+        EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::WriteAllComplete), 0, 0, 0); // End of params marker
+        PostTxFrame(&tx);
         return;
     }
 }

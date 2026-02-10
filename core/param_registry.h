@@ -36,6 +36,7 @@ struct ParamInfo
     uint16_t nIndex;
     uint8_t nSubIndex;
     void* pVal;
+    void* pTempVal; // Used for staging new value before applying
     ParamType eType;
     float fDefaultVal;
     float fMinVal;
@@ -46,6 +47,6 @@ extern const ParamInfo stParams[];
 extern const uint16_t NUM_PARAMS;
 
 const ParamInfo* FindParam(uint16_t index, uint8_t subindex);
-uint32_t ReadParam(const ParamInfo* param);
-bool WriteParam(const ParamInfo* param, uint32_t value);
+uint32_t ReadParam(const ParamInfo* param, bool temp = false);
+bool WriteParam(const ParamInfo* param, uint32_t value, bool temp = false);
 bool IsDefaultValue(const ParamInfo* param);

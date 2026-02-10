@@ -12,4 +12,4 @@ struct ParamMsg
 };
 
 void ProcessParamMsg(CANRxFrame *rx);
-void SetAllDefaultParams();
+void SetAllDefaultParams(bool temp = false);

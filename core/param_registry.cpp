@@ -69,36 +69,38 @@ const ParamInfo* FindParam(uint16_t index, uint8_t subindex) {
     return nullptr;
 }
 
-uint32_t ReadParam(const ParamInfo* param)
+uint32_t ReadParam(const ParamInfo* param, bool temp)
 {
-    if(param == nullptr || param->pVal == nullptr)
+    if(param == nullptr || param->pVal == nullptr || param->pTempVal == nullptr)
         return 0;
+
+    void* targetPtr = temp ? param->pTempVal : param->pVal;
 
     switch (param->eType) {
         case ParamType::Bool:
-            return *static_cast<bool*>(param->pVal) ? 1 : 0;
+            return *static_cast<bool*>(targetPtr) ? 1 : 0;
         case ParamType::UInt8:
         case ParamType::Enum:
-            return *static_cast<uint8_t*>(param->pVal);
+            return *static_cast<uint8_t*>(targetPtr);
         case ParamType::Int8:
-            return static_cast<uint32_t>(*static_cast<int8_t*>(param->pVal));
+            return static_cast<uint32_t>(*static_cast<int8_t*>(targetPtr));
         case ParamType::UInt16:
-            return *static_cast<uint16_t*>(param->pVal);
+            return *static_cast<uint16_t*>(targetPtr);
         case ParamType::Int16:
-            return static_cast<uint32_t>(*static_cast<int16_t*>(param->pVal));
+            return static_cast<uint32_t>(*static_cast<int16_t*>(targetPtr));
         case ParamType::UInt32:
         case ParamType::Float:
-            return *static_cast<uint32_t*>(param->pVal);
+            return *static_cast<uint32_t*>(targetPtr);
         case ParamType::Int32:
-            return static_cast<uint32_t>(*static_cast<int32_t*>(param->pVal));
+            return static_cast<uint32_t>(*static_cast<int32_t*>(targetPtr));
         default:
             return 0;
     }
 }
 
-bool WriteParam(const ParamInfo* param, uint32_t value)
+bool WriteParam(const ParamInfo* param, uint32_t value, bool temp)
 {
-    if(param == nullptr || param->pVal == nullptr)
+    if(param == nullptr || param->pVal == nullptr || param->pTempVal == nullptr)
         return false;
 
     // Range validation
@@ -115,29 +117,31 @@ bool WriteParam(const ParamInfo* param, uint32_t value)
             return false;
     }
 
+    void* targetPtr = temp ? param->pTempVal : param->pVal;
+
     switch (param->eType) {
         case ParamType::Bool:
-            *static_cast<bool*>(param->pVal) = (value != 0);
+            *static_cast<bool*>(targetPtr) = (value != 0);
             break;
         case ParamType::UInt8:
         case ParamType::Enum:
-            *static_cast<uint8_t*>(param->pVal) = static_cast<uint8_t>(value);
+            *static_cast<uint8_t*>(targetPtr) = static_cast<uint8_t>(value);
             break;
         case ParamType::Int8:
-            *static_cast<int8_t*>(param->pVal) = static_cast<int8_t>(value);
+            *static_cast<int8_t*>(targetPtr) = static_cast<int8_t>(value);
             break;
         case ParamType::UInt16:
-            *static_cast<uint16_t*>(param->pVal) = static_cast<uint16_t>(value);
+            *static_cast<uint16_t*>(targetPtr) = static_cast<uint16_t>(value);
             break;
         case ParamType::Int16:
-            *static_cast<int16_t*>(param->pVal) = static_cast<int16_t>(value);
+            *static_cast<int16_t*>(targetPtr) = static_cast<int16_t>(value);
             break;
         case ParamType::UInt32:
         case ParamType::Float:
-            *static_cast<uint32_t*>(param->pVal) = value;
+            *static_cast<uint32_t*>(targetPtr) = value;
             break;
         case ParamType::Int32:
-            *static_cast<int32_t*>(param->pVal) = static_cast<int32_t>(value);
+            *static_cast<int32_t*>(targetPtr) = static_cast<int32_t>(value);
             break;
         default:
             return false;

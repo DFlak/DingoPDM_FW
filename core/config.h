@@ -200,6 +200,7 @@ struct PdmConfig{
 };
 
 extern PdmConfig stConfig;
+extern PdmConfig stConfigTemp; // Used for staging new config before applying
 
 void InitConfig();
 bool WriteConfig();
