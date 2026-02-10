@@ -30,6 +30,9 @@ void CheckRequestMsgs(CANRxFrame *frame)
         txMsg.DLC = 2;
         txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::Sleep) + 128;
         txMsg.data8[1] = 1;
+        txMsg.data16[1] = 0;
+        txMsg.data16[2] = 0;
+        txMsg.data16[3] = 0;
 
         PostTxFrame(&txMsg);
 
@@ -46,15 +49,17 @@ void CheckRequestMsgs(CANRxFrame *frame)
         CANTxFrame txMsg;
         txMsg.SID = stConfig.stDevConfig.nBaseId + TX_SETTINGS_ID_OFFSET;
         txMsg.IDE = CAN_IDE_STD;
-        txMsg.DLC = 2;
+        txMsg.DLC = 8;
         txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::BurnSettings) + 128;
         txMsg.data8[1] = WriteConfig();
-
+        txMsg.data16[1] = 0;
+        txMsg.data16[2] = 0;
+        txMsg.data16[3] = 0;
         PostTxFrame(&txMsg);
     }
 
     // Check for bootloader request
-    if ((frame->DLC == 6) &&
+    if ((frame->DLC == 8) &&
         (frame->data8[0] == static_cast<uint8_t>(MsgCmd::Bootloader)) && 
         (frame->data8[1] == 'B') && (frame->data8[2] == 'O') && 
         (frame->data8[3] == 'O') && (frame->data8[4] == 'T') && (frame->data8[5] == 'L'))
@@ -63,18 +68,21 @@ void CheckRequestMsgs(CANRxFrame *frame)
     }
 
     // Check for version request
-    if ((frame->DLC == 1) &&
+    if ((frame->DLC == 8) &&
         (frame->data8[0] == static_cast<uint8_t>(MsgCmd::Version)))
     {
         CANTxFrame txMsg;
         txMsg.SID = stConfig.stDevConfig.nBaseId + TX_SETTINGS_ID_OFFSET;
         txMsg.IDE = CAN_IDE_STD;
-        txMsg.DLC = 5;
+        txMsg.DLC = 8;
         txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::Version) + 128;
         txMsg.data8[1] = MAJOR_VERSION;
         txMsg.data8[2] = MINOR_VERSION;
         txMsg.data8[3] = BUILD >> 8;
         txMsg.data8[4] = BUILD & 0xFF;
+        txMsg.data8[5] = 0;
+        txMsg.data8[6] = 0;
+        txMsg.data8[7] = 0;
 
         PostTxFrame(&txMsg);
     }

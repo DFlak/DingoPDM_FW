@@ -87,6 +87,9 @@ void ProcessParamMsg(CANRxFrame *rx) {
     if (rx->SID != stConfig.stDevConfig.nBaseId - 1)
         return;
 
+    if (rx->DLC != 8)
+        return;
+
     msg.eCmd = static_cast<MsgCmd>(rx->data8[0]);
 
     if (!(msg.eCmd == MsgCmd::Read || 
