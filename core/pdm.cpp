@@ -204,7 +204,7 @@ void States()
         Error::SetFatalError(eError, MsgSrc::State_Error);
     }
 
-    SendInfoMsgs();
+    CheckInfoMsgs();
 
     fState = static_cast<float>(eState);
 }

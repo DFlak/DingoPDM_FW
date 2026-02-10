@@ -5,8 +5,10 @@
 
 // Info message management functions extracted from pdm.cpp
 
-void SendInfoMsgs();
+void CheckInfoMsgs();
 void InitInfoMsgs();
+
+void SendInfoMsg(MsgType type, MsgSrc src, uint16_t nId, uint16_t nData0, uint16_t nData1, uint16_t nData2);
 
 class InfoMsg
 {
