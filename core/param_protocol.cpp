@@ -7,6 +7,9 @@
 
 extern PdmConfig stConfig;
 
+uint16_t nNumWriteParams = 0;
+uint16_t nNumReadParams = 0;
+
 void DecodeParamCmd(CANRxFrame *rx, ParamMsg *out)
 {
     out->eCmd = static_cast<MsgCmd>(rx->data8[0]);
@@ -46,13 +49,15 @@ void SendAllNonDefaultParams() {
                             stParams[i].nIndex, stParams[i].nSubIndex, value);
             PostTxFrame(&tx);
 
+            nNumReadParams++;
+            
             // Small delay to avoid saturating CAN bus
             chThdSleepMilliseconds(1);
         }
     }
 
     chThdSleepMilliseconds(1);
-    EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ReadAllComplete), 0, 0, 0); // End of params marker
+    EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ReadAllComplete), nNumReadParams, 0, 0); // End of params marker, return number of params sent
     PostTxFrame(&tx);
 }
 
@@ -118,6 +123,7 @@ void ProcessParamMsg(CANRxFrame *rx) {
     }
 
     if (msg.eCmd == MsgCmd::ReadAll) {
+        nNumReadParams = 0;
         EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ReadAll), 0, 0, 0); // Start of params marker
         PostTxFrame(&tx);
         chThdSleepMilliseconds(1);
@@ -127,6 +133,7 @@ void ProcessParamMsg(CANRxFrame *rx) {
     }
 
     if (msg.eCmd == MsgCmd::WriteAll) {
+        nNumWriteParams = 0;
         SetAllDefaultParams(true); // Clear temp values
         EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::WriteAll), 0, 0, 0); // Start of params marker
         PostTxFrame(&tx);
@@ -137,16 +144,25 @@ void ProcessParamMsg(CANRxFrame *rx) {
         const ParamInfo* param = FindParam(msg.nIndex, msg.nSubIndex);
         if (param && WriteParam(param, msg.nValue, true)) {
             uint32_t value = ReadParam(param, true);
-            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::Write), msg.nIndex, msg.nSubIndex, value);
+            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::WriteAllVal), msg.nIndex, msg.nSubIndex, value);
             PostTxFrame(&tx);
+            nNumWriteParams++;
             return;
         }
         return;
     }
 
     if (msg.eCmd == MsgCmd::WriteAllComplete) {
+        // Ensure all params were written
+        uint16_t nExpectedParams = rx->data8[1] | (rx->data8[2] << 8);
+        if (nNumWriteParams != nExpectedParams) {
+            // Mismatch in expected vs actual params
+            EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::WriteAllComplete), 0, 0, 0);
+            PostTxFrame(&tx);
+            return;
+        }
         SetAllDefaultParams(false); // Apply temp values
-        EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::WriteAllComplete), 0, 0, 0); // End of params marker
+        EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::WriteAllComplete), nNumWriteParams, 0, 0); // End of params marker, return number of params written
         PostTxFrame(&tx);
         return;
     }
