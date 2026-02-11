@@ -4,14 +4,14 @@ on:
   push:
     branches: [ main, master ]
     paths:
-      - "dingopdm_config.h"
+      - "core/core/dingopdm_config.h"
       - "**/*.c"
       - "**/*.h"
       - "Makefile"
       - ".github/workflows/build_firmware.yml"
   pull_request:
     paths:
-      - "dingopdm_config.h"
+      - "core/core/dingopdm_config.h"
       - "**/*.c"
       - "**/*.h"
       - "Makefile"
@@ -31,9 +31,9 @@ jobs:
       - name: Extract version number
         id: extract_version
         run: |
-          MAJOR=$(grep '#define MAJOR_VERSION' dingopdm_config.h | awk '{print $3}')
-          MINOR=$(grep '#define MINOR_VERSION' dingopdm_config.h | awk '{print $3}')
-          BUILD=$(grep '#define BUILD' dingopdm_config.h | awk '{print $3}')
+          MAJOR=$(grep '#define MAJOR_VERSION' core/dingopdm_config.h | awk '{print $3}')
+          MINOR=$(grep '#define MINOR_VERSION' core/dingopdm_config.h | awk '{print $3}')
+          BUILD=$(grep '#define BUILD' core/dingopdm_config.h | awk '{print $3}')
           VERSION="${MAJOR}.${MINOR}.${BUILD}"
           VERSION_DASHED="${MAJOR}-${MINOR}-${BUILD}"
 
