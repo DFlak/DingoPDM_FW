@@ -28,7 +28,7 @@ void CheckRequestMsgs(CANRxFrame *frame)
         txMsg.SID = stConfig.stDevConfig.nBaseId + TX_SETTINGS_ID_OFFSET;
         txMsg.IDE = CAN_IDE_STD;
         txMsg.DLC = 2;
-        txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::Sleep) + 128;
+        txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::Sleep);
         txMsg.data8[1] = 1;
         txMsg.data16[1] = 0;
         txMsg.data16[2] = 0;
@@ -50,7 +50,7 @@ void CheckRequestMsgs(CANRxFrame *frame)
         txMsg.SID = stConfig.stDevConfig.nBaseId + TX_SETTINGS_ID_OFFSET;
         txMsg.IDE = CAN_IDE_STD;
         txMsg.DLC = 8;
-        txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::BurnSettings) + 128;
+        txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::BurnSettings);
         txMsg.data8[1] = WriteConfig();
         txMsg.data16[1] = 0;
         txMsg.data16[2] = 0;
@@ -75,7 +75,7 @@ void CheckRequestMsgs(CANRxFrame *frame)
         txMsg.SID = stConfig.stDevConfig.nBaseId + TX_SETTINGS_ID_OFFSET;
         txMsg.IDE = CAN_IDE_STD;
         txMsg.DLC = 8;
-        txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::Version) + 128;
+        txMsg.data8[0] = static_cast<uint8_t>(MsgCmd::Version);
         txMsg.data8[1] = MAJOR_VERSION;
         txMsg.data8[2] = MINOR_VERSION;
         txMsg.data8[3] = BUILD >> 8;

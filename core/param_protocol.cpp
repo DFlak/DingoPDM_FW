@@ -164,7 +164,7 @@ void ProcessParamMsg(CANRxFrame *rx) {
             PostTxFrame(&tx);
             return;
         }
-        SetAllDefaultParams(false); // Apply temp values
+        ApplyTempParams();
         EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::WriteAllComplete), nNumWriteParams, 0, 0); // End of params marker, return number of params written
         PostTxFrame(&tx);
         return;
