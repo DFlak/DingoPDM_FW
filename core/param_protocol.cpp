@@ -43,7 +43,7 @@ void SendAllNonDefaultParams() {
     CANTxFrame tx;
 
     for (int i = 0; i < NUM_PARAMS; i++) {
-        if (!IsDefaultValue(&stParams[i])) {
+        //if (!IsDefaultValue(&stParams[i])) {
             uint32_t value = ReadParam(&stParams[i]);
             EncodeParamRsp(&tx, static_cast<uint8_t>(MsgCmd::ReadAllRsp), 
                             stParams[i].nIndex, stParams[i].nSubIndex, value);
@@ -51,9 +51,9 @@ void SendAllNonDefaultParams() {
 
             nNumReadParams++;
             
-            // Small delay to avoid saturating CAN bus
+            // Small delay to avoid saturating mailbox
             chThdSleepMilliseconds(1);
-        }
+        //}
     }
 
     chThdSleepMilliseconds(1);

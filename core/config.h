@@ -151,21 +151,21 @@ struct Config_Condition{
 struct Config_KeypadButton{
   bool bEnabled;
   InputMode eMode;
-  uint8_t nNumOfValColors;
-  uint8_t nValColors[4];
+  uint8_t nColors[4];
   uint8_t nFaultColor;
-  uint16_t nValVars[4];
+  uint16_t nVars[4];
   uint16_t nFaultVar;
-  bool bValBlinking[4];
-  bool bFaultBlinking;
-  uint8_t nValBlinkingColors[4];
-  uint8_t nFaultBlinkingColor;
+  bool bBlink[4];
+  bool bFaultBlink;
+  uint8_t nBlinkColors[4];
+  uint8_t nFaultBlinkColor;
 };
 
 struct Config_KeypadDial{
-  uint8_t nDialMinLed;
-  uint8_t nDialMaxLed;
-  uint8_t nDialLedOffset;
+  bool bEnabled;
+  uint8_t nMinLed;
+  uint8_t nMaxLed;
+  uint8_t nLedOffset;
 };
 
 struct Config_Keypad{

@@ -9,7 +9,7 @@ void UpdateLedBlinkMarine(KeypadButton* btn)
     BlinkMarineButtonColor eColor = BlinkMarineButtonColor::Off;
     BlinkMarineButtonColor eBlinkColor = BlinkMarineButtonColor::Off;
 
-    for (uint8_t i = 0; i < btn->pConfig->nNumOfValColors; i++)
+    for (uint8_t i = 0; i < 4; i++)
     {
         // Check if the value is equal to the index of the color
         // If so, set the color to the corresponding value color
@@ -17,14 +17,14 @@ void UpdateLedBlinkMarine(KeypadButton* btn)
         // Integer values check values 0 to nNumOfValColors - 1
         if (static_cast<uint8_t>(*btn->pLedVars[i]) == 1)
         {
-            eColor = static_cast<BlinkMarineButtonColor>(btn->pConfig->nValColors[i]);
+            eColor = static_cast<BlinkMarineButtonColor>(btn->pConfig->nColors[i]);
 
-            if (btn->pConfig->bValBlinking[i])
+            if (btn->pConfig->bBlink[i])
             {
                 if (eColor == BlinkMarineButtonColor::Off)
-                    eBlinkColor = static_cast<BlinkMarineButtonColor>(btn->pConfig->nValBlinkingColors[i]);
+                    eBlinkColor = static_cast<BlinkMarineButtonColor>(btn->pConfig->nBlinkColors[i]);
                 else
-                    eBlinkColor = static_cast<BlinkMarineButtonColor>(btn->pConfig->nValBlinkingColors[i] ^ btn->pConfig->nValColors[i]);
+                    eBlinkColor = static_cast<BlinkMarineButtonColor>(btn->pConfig->nBlinkColors[i] ^ btn->pConfig->nColors[i]);
             }
         }
     }
@@ -34,12 +34,12 @@ void UpdateLedBlinkMarine(KeypadButton* btn)
     {
         eColor = (BlinkMarineButtonColor)btn->pConfig->nFaultColor;
 
-        if(btn->pConfig->bFaultBlinking)
+        if(btn->pConfig->bFaultBlink)
         {
             if (eColor == BlinkMarineButtonColor::Off)
-                eBlinkColor = (BlinkMarineButtonColor)btn->pConfig->nFaultBlinkingColor;
+                eBlinkColor = (BlinkMarineButtonColor)btn->pConfig->nFaultBlinkColor;
             else
-                eBlinkColor = (BlinkMarineButtonColor)(btn->pConfig->nFaultBlinkingColor ^ btn->pConfig->nFaultColor);
+                eBlinkColor = (BlinkMarineButtonColor)(btn->pConfig->nFaultBlinkColor ^ btn->pConfig->nFaultColor);
         }
     }
 

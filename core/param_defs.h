@@ -172,10 +172,10 @@
     {0x2000 + (i), 0,  &stConfig.stCanOutput[i].bEnabled,   &stConfigTemp.stCanOutput[i].bEnabled,   ParamType::Bool,   0, 0, 1}, \
     {0x2000 + (i), 1,  &stConfig.stCanOutput[i].nInput,     &stConfigTemp.stCanOutput[i].nInput,     ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
     {0x2000 + (i), 2,  &stConfig.stCanOutput[i].nIDE,       &stConfigTemp.stCanOutput[i].nIDE,       ParamType::UInt8,  0, 0, 1}, \
-    {0x2000 + (i), 3,  &stConfig.stCanOutput[i].nSID,       &stConfigTemp.stCanOutput[i].nSID,       ParamType::UInt16, 0x7D0, 0, 0x7FF}, \
+    {0x2000 + (i), 3,  &stConfig.stCanOutput[i].nSID,       &stConfigTemp.stCanOutput[i].nSID,       ParamType::UInt16, 0, 0, 0x7FF}, \
     {0x2000 + (i), 4,  &stConfig.stCanOutput[i].nEID,       &stConfigTemp.stCanOutput[i].nEID,       ParamType::UInt32, 0, 0, 536870911.0f}, \
     {0x2000 + (i), 5,  &stConfig.stCanOutput[i].nStartBit,  &stConfigTemp.stCanOutput[i].nStartBit,  ParamType::UInt8,  0, 0, 63}, \
-    {0x2000 + (i), 6,  &stConfig.stCanOutput[i].nBitLength, &stConfigTemp.stCanOutput[i].nBitLength, ParamType::UInt8,  8, 1, 32}, \
+    {0x2000 + (i), 6,  &stConfig.stCanOutput[i].nBitLength, &stConfigTemp.stCanOutput[i].nBitLength, ParamType::UInt8,  0, 1, 32}, \
     {0x2000 + (i), 7,  &stConfig.stCanOutput[i].fFactor,    &stConfigTemp.stCanOutput[i].fFactor,    ParamType::Float,  1.0f, 0.0f, 1e9f}, \
     {0x2000 + (i), 8,  &stConfig.stCanOutput[i].fOffset,    &stConfigTemp.stCanOutput[i].fOffset,    ParamType::Float,  0.0f, -1e9f, 1e9f}, \
     {0x2000 + (i), 9,  &stConfig.stCanOutput[i].eByteOrder, &stConfigTemp.stCanOutput[i].eByteOrder, ParamType::Enum,   static_cast<float>(ByteOrder::LittleEndian), 0, 1}, \
@@ -189,7 +189,7 @@
     {0x3000 + (i), 0,  &stConfig.stKeypad[i].bEnabled,                &stConfigTemp.stKeypad[i].bEnabled,                 ParamType::Bool,   0, 0, 1}, \
     {0x3000 + (i), 1,  &stConfig.stKeypad[i].nNodeId,                 &stConfigTemp.stKeypad[i].nNodeId,                  ParamType::UInt8,  0, 0, 127}, \
     {0x3000 + (i), 2,  &stConfig.stKeypad[i].bTimeoutEnabled,         &stConfigTemp.stKeypad[i].bTimeoutEnabled,          ParamType::Bool,   0, 0, 1}, \
-    {0x3000 + (i), 3,  &stConfig.stKeypad[i].nTimeout,                &stConfigTemp.stKeypad[i].nTimeout,                 ParamType::UInt16, 1000, 0, 60000}, \
+    {0x3000 + (i), 3,  &stConfig.stKeypad[i].nTimeout,                &stConfigTemp.stKeypad[i].nTimeout,                 ParamType::UInt16, 0, 0, 60000}, \
     {0x3000 + (i), 4,  &stConfig.stKeypad[i].eModel,                  &stConfigTemp.stKeypad[i].eModel,                   ParamType::Enum,   static_cast<float>(KeypadModel::Blink12Key), 0, 13}, \
     {0x3000 + (i), 5,  &stConfig.stKeypad[i].nBacklightBrightness,    &stConfigTemp.stKeypad[i].nBacklightBrightness,     ParamType::UInt8,  100, 0, 100}, \
     {0x3000 + (i), 6,  &stConfig.stKeypad[i].nDimBacklightBrightness, &stConfigTemp.stKeypad[i].nDimBacklightBrightness,  ParamType::UInt8,  50, 0, 100}, \
@@ -202,34 +202,33 @@
 // Keypad Button Parameters - Base 0x3100 + (keypad * 32) + button
 //=============================================================================
 #define KEYPAD_BUTTON_PARAMS(k, b) \
-    {0x3100 + (k) * 32 + (b), 0,  &stConfig.stKeypad[k].stButton[b].bEnabled,              &stConfigTemp.stKeypad[k].stButton[b].bEnabled,              ParamType::Bool,   0, 0, 1}, \
-    {0x3100 + (k) * 32 + (b), 1,  &stConfig.stKeypad[k].stButton[b].eMode,                 &stConfigTemp.stKeypad[k].stButton[b].eMode,                 ParamType::Enum,   static_cast<float>(InputMode::Momentary), 0, 1}, \
-    {0x3100 + (k) * 32 + (b), 2,  &stConfig.stKeypad[k].stButton[b].nNumOfValColors,       &stConfigTemp.stKeypad[k].stButton[b].nNumOfValColors,       ParamType::UInt8,  1, 0, 4}, \
-    {0x3100 + (k) * 32 + (b), 3,  &stConfig.stKeypad[k].stButton[b].nValColors[0],         &stConfigTemp.stKeypad[k].stButton[b].nValColors[0],         ParamType::UInt8,  0, 0, 7}, \
-    {0x3100 + (k) * 32 + (b), 4,  &stConfig.stKeypad[k].stButton[b].nValColors[1],         &stConfigTemp.stKeypad[k].stButton[b].nValColors[1],         ParamType::UInt8,  0, 0, 7}, \
-    {0x3100 + (k) * 32 + (b), 5,  &stConfig.stKeypad[k].stButton[b].nValColors[2],         &stConfigTemp.stKeypad[k].stButton[b].nValColors[2],         ParamType::UInt8,  0, 0, 7}, \
-    {0x3100 + (k) * 32 + (b), 6,  &stConfig.stKeypad[k].stButton[b].nValColors[3],         &stConfigTemp.stKeypad[k].stButton[b].nValColors[3],         ParamType::UInt8,  0, 0, 7}, \
-    {0x3100 + (k) * 32 + (b), 7,  &stConfig.stKeypad[k].stButton[b].nFaultColor,           &stConfigTemp.stKeypad[k].stButton[b].nFaultColor,           ParamType::UInt8,  0, 0, 7}, \
-    {0x3100 + (k) * 32 + (b), 8,  &stConfig.stKeypad[k].stButton[b].nValVars[0],           &stConfigTemp.stKeypad[k].stButton[b].nValVars[0],           ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
-    {0x3100 + (k) * 32 + (b), 9,  &stConfig.stKeypad[k].stButton[b].nValVars[1],           &stConfigTemp.stKeypad[k].stButton[b].nValVars[1],           ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
-    {0x3100 + (k) * 32 + (b), 10, &stConfig.stKeypad[k].stButton[b].nValVars[2],           &stConfigTemp.stKeypad[k].stButton[b].nValVars[2],           ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
-    {0x3100 + (k) * 32 + (b), 11, &stConfig.stKeypad[k].stButton[b].nValVars[3],           &stConfigTemp.stKeypad[k].stButton[b].nValVars[3],           ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
-    {0x3100 + (k) * 32 + (b), 12, &stConfig.stKeypad[k].stButton[b].nFaultVar,             &stConfigTemp.stKeypad[k].stButton[b].nFaultVar,             ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
-    {0x3100 + (k) * 32 + (b), 13, &stConfig.stKeypad[k].stButton[b].bValBlinking[0],       &stConfigTemp.stKeypad[k].stButton[b].bValBlinking[0],       ParamType::Bool,   0, 0, 1}, \
-    {0x3100 + (k) * 32 + (b), 14, &stConfig.stKeypad[k].stButton[b].bValBlinking[1],       &stConfigTemp.stKeypad[k].stButton[b].bValBlinking[1],       ParamType::Bool,   0, 0, 1}, \
-    {0x3100 + (k) * 32 + (b), 15, &stConfig.stKeypad[k].stButton[b].bValBlinking[2],       &stConfigTemp.stKeypad[k].stButton[b].bValBlinking[2],       ParamType::Bool,   0, 0, 1}, \
-    {0x3100 + (k) * 32 + (b), 16, &stConfig.stKeypad[k].stButton[b].bValBlinking[3],       &stConfigTemp.stKeypad[k].stButton[b].bValBlinking[3],       ParamType::Bool,   0, 0, 1}, \
-    {0x3100 + (k) * 32 + (b), 17, &stConfig.stKeypad[k].stButton[b].bFaultBlinking,        &stConfigTemp.stKeypad[k].stButton[b].bFaultBlinking,        ParamType::Bool,   0, 0, 1}, \
-    {0x3100 + (k) * 32 + (b), 18, &stConfig.stKeypad[k].stButton[b].nValBlinkingColors[0], &stConfigTemp.stKeypad[k].stButton[b].nValBlinkingColors[0], ParamType::UInt8,  0, 0, 7}, \
-    {0x3100 + (k) * 32 + (b), 19, &stConfig.stKeypad[k].stButton[b].nValBlinkingColors[1], &stConfigTemp.stKeypad[k].stButton[b].nValBlinkingColors[1], ParamType::UInt8,  0, 0, 7}, \
-    {0x3100 + (k) * 32 + (b), 20, &stConfig.stKeypad[k].stButton[b].nValBlinkingColors[2], &stConfigTemp.stKeypad[k].stButton[b].nValBlinkingColors[2], ParamType::UInt8,  0, 0, 7}, \
-    {0x3100 + (k) * 32 + (b), 21, &stConfig.stKeypad[k].stButton[b].nValBlinkingColors[3], &stConfigTemp.stKeypad[k].stButton[b].nValBlinkingColors[3], ParamType::UInt8,  0, 0, 7}, \
-    {0x3100 + (k) * 32 + (b), 22, &stConfig.stKeypad[k].stButton[b].nFaultBlinkingColor,   &stConfigTemp.stKeypad[k].stButton[b].nFaultBlinkingColor,   ParamType::UInt8,  0, 0, 7}
+    {0x3100 + (k) * 32 + (b), 0,  &stConfig.stKeypad[k].stButton[b].bEnabled,              &stConfigTemp.stKeypad[k].stButton[b].bEnabled,        ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 1,  &stConfig.stKeypad[k].stButton[b].eMode,                 &stConfigTemp.stKeypad[k].stButton[b].eMode,           ParamType::Enum,   static_cast<float>(InputMode::Momentary), 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 2,  &stConfig.stKeypad[k].stButton[b].nColors[0],            &stConfigTemp.stKeypad[k].stButton[b].nColors[0],      ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 3,  &stConfig.stKeypad[k].stButton[b].nColors[1],            &stConfigTemp.stKeypad[k].stButton[b].nColors[1],      ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 4,  &stConfig.stKeypad[k].stButton[b].nColors[2],            &stConfigTemp.stKeypad[k].stButton[b].nColors[2],      ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 5,  &stConfig.stKeypad[k].stButton[b].nColors[3],            &stConfigTemp.stKeypad[k].stButton[b].nColors[3],      ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 6,  &stConfig.stKeypad[k].stButton[b].nFaultColor,           &stConfigTemp.stKeypad[k].stButton[b].nFaultColor,     ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 7,  &stConfig.stKeypad[k].stButton[b].nVars[0],              &stConfigTemp.stKeypad[k].stButton[b].nVars[0],        ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 8,  &stConfig.stKeypad[k].stButton[b].nVars[1],              &stConfigTemp.stKeypad[k].stButton[b].nVars[1],        ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 9,  &stConfig.stKeypad[k].stButton[b].nVars[2],              &stConfigTemp.stKeypad[k].stButton[b].nVars[2],        ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 10, &stConfig.stKeypad[k].stButton[b].nVars[3],              &stConfigTemp.stKeypad[k].stButton[b].nVars[3],        ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 11, &stConfig.stKeypad[k].stButton[b].nFaultVar,             &stConfigTemp.stKeypad[k].stButton[b].nFaultVar,       ParamType::UInt16, 0, 0, PDM_VAR_MAP_SIZE - 1}, \
+    {0x3100 + (k) * 32 + (b), 12, &stConfig.stKeypad[k].stButton[b].bBlink[0],             &stConfigTemp.stKeypad[k].stButton[b].bBlink[0],       ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 13, &stConfig.stKeypad[k].stButton[b].bBlink[1],             &stConfigTemp.stKeypad[k].stButton[b].bBlink[1],       ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 14, &stConfig.stKeypad[k].stButton[b].bBlink[2],             &stConfigTemp.stKeypad[k].stButton[b].bBlink[2],       ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 15, &stConfig.stKeypad[k].stButton[b].bBlink[3],             &stConfigTemp.stKeypad[k].stButton[b].bBlink[3],       ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 16, &stConfig.stKeypad[k].stButton[b].bFaultBlink,           &stConfigTemp.stKeypad[k].stButton[b].bFaultBlink,     ParamType::Bool,   0, 0, 1}, \
+    {0x3100 + (k) * 32 + (b), 17, &stConfig.stKeypad[k].stButton[b].nBlinkColors[0],       &stConfigTemp.stKeypad[k].stButton[b].nBlinkColors[0], ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 18, &stConfig.stKeypad[k].stButton[b].nBlinkColors[1],       &stConfigTemp.stKeypad[k].stButton[b].nBlinkColors[1], ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 19, &stConfig.stKeypad[k].stButton[b].nBlinkColors[2],       &stConfigTemp.stKeypad[k].stButton[b].nBlinkColors[2], ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 20, &stConfig.stKeypad[k].stButton[b].nBlinkColors[3],       &stConfigTemp.stKeypad[k].stButton[b].nBlinkColors[3], ParamType::UInt8,  0, 0, 7}, \
+    {0x3100 + (k) * 32 + (b), 21, &stConfig.stKeypad[k].stButton[b].nFaultBlinkColor,      &stConfigTemp.stKeypad[k].stButton[b].nFaultBlinkColor,ParamType::UInt8,  0, 0, 7}
 
 //=============================================================================
 // Keypad Dial Parameters - Base 0x3200 + (keypad * 4) + dial
 //=============================================================================
 #define KEYPAD_DIAL_PARAMS(k, d) \
-    {0x3200 + (k) * 4 + (d), 0, &stConfig.stKeypad[k].stDial[d].nDialMinLed,    &stConfigTemp.stKeypad[k].stDial[d].nDialMinLed,    ParamType::UInt8, 0, 0, 255}, \
-    {0x3200 + (k) * 4 + (d), 1, &stConfig.stKeypad[k].stDial[d].nDialMaxLed,    &stConfigTemp.stKeypad[k].stDial[d].nDialMaxLed,    ParamType::UInt8, 0, 0, 255}, \
-    {0x3200 + (k) * 4 + (d), 2, &stConfig.stKeypad[k].stDial[d].nDialLedOffset, &stConfigTemp.stKeypad[k].stDial[d].nDialLedOffset, ParamType::UInt8, 0, 0, 255}
+    {0x3200 + (k) * 4 + (d), 0, &stConfig.stKeypad[k].stDial[d].nMinLed,    &stConfigTemp.stKeypad[k].stDial[d].nMinLed,    ParamType::UInt8, 0, 0, 255}, \
+    {0x3200 + (k) * 4 + (d), 1, &stConfig.stKeypad[k].stDial[d].nMaxLed,    &stConfigTemp.stKeypad[k].stDial[d].nMaxLed,    ParamType::UInt8, 0, 0, 255}, \
+    {0x3200 + (k) * 4 + (d), 2, &stConfig.stKeypad[k].stDial[d].nLedOffset, &stConfigTemp.stKeypad[k].stDial[d].nLedOffset, ParamType::UInt8, 0, 0, 255}

@@ -19,10 +19,10 @@ public:
     void SetConfig(Config_KeypadButton *config)
     {
         pConfig = config;
-        pLedVars[0] = pVarMap[config->nValVars[0]];
-        pLedVars[1] = pVarMap[config->nValVars[1]];
-        pLedVars[2] = pVarMap[config->nValVars[2]];
-        pLedVars[3] = pVarMap[config->nValVars[3]];
+        pLedVars[0] = pVarMap[config->nVars[0]];
+        pLedVars[1] = pVarMap[config->nVars[1]];
+        pLedVars[2] = pVarMap[config->nVars[2]];
+        pLedVars[3] = pVarMap[config->nVars[3]];
         pFaultLedVar = pVarMap[config->nFaultVar];
     }
 
