@@ -232,11 +232,12 @@ enum class KeypadModel : uint8_t
     Blink12Key = 6,
     Blink15Key = 7,
     Blink13Key2Dial = 8,
-    BlinkRacepad = 9,
+    Grayhill1Key = 10,
     Grayhill6Key = 20,
     Grayhill8Key = 21,
-    Grayhill15Key = 22,
-    Grayhill20Key = 23
+    Grayhill12Key = 22,
+    Grayhill15Key = 23,
+    Grayhill20Key = 24
 };
 
 enum class BlinkMarineButtonColor : uint8_t
@@ -263,4 +264,27 @@ enum class BlinkMarineBacklightColor : uint8_t
     White = 0x07,
     Amber = 0x08,
     YellowGreen = 0x09
+};
+
+enum class BlinkMarineMessageId : uint16_t
+{
+    Nmt = 0x00,
+    ButtonState = 0x180,
+    SetLed = 0x200,
+    DialState1 = 0x280,
+    SetLedBlink = 0x300,
+    DialState2 = 0x380,
+    LedBrightness = 0x400,
+    AnalogInput = 0x480,
+    Backlight = 0x500,
+    SdoResponse = 0x580,
+    SdoRequest = 0x600,
+    Heartbeat = 0x700
+};
+
+enum class GrayhillMessageId : uint16_t
+{
+    ButtonState = 0x180,
+    LedControl = 0x200,
+    BrightnessControl = 0x300
 };

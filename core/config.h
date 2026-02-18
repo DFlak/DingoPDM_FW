@@ -163,8 +163,8 @@ struct Config_KeypadButton{
 
 struct Config_KeypadDial{
   bool bEnabled;
-  uint8_t nMinLed;
-  uint8_t nMaxLed;
+  uint8_t nMinCount;
+  uint8_t nMaxCount;
   uint8_t nLedOffset;
 };
 

@@ -1,18 +1,20 @@
 #include "blink_dial.h"
 #include "dbc.h"
 
-void BlinkDial::Update(uint64_t data)
+void BlinkDial::CheckMsg(uint64_t data)
 {
-    nTicks = data & 0x7F;
-    bClockwise = (data & 0x80) >> 7 ? true : false;
-    bCounterClockwise = (data & 0x80) >> 7 ? false : true;
-
-    nEncoderTicks = (data & 0xFFFF00) >> 8;
-
-    nMaxEncoderTicks = (data & 0xFF000000) >> 24;
+    nCounter = data & 0x7F;
+    nCounterMax = (data & 0xFF000000) >> 24;
 }
 
 void BlinkDial::UpdateLeds()
 {
-    //TODO: Implement LED update logic
+
+    uint8_t nLedsToLight = (nCounter * 16 + nCounterMax - 1) / nCounterMax; // Round up division
+    for (uint8_t i = 0; i < 16; i++)
+    {
+        uint8_t nLedIndex = (pConfig->nLedOffset + i) % 16; // Wrap around
+        bLeds[nLedIndex] = (i < nLedsToLight);
+    }
+
 }

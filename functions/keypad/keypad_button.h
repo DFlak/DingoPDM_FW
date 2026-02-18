@@ -32,8 +32,6 @@ public:
         fnGetLedState = stateFn;
     }
 
-    bool Update(bool bNewVal);
-
     void UpdateLed()
     {
         if (fnUpdateLed)

@@ -52,7 +52,7 @@ void Keypad::SetConfig(Config_Keypad* config)
     pConfig = config;
     pDimmingInput = &pVarMap[config->nDimmingVar][0];
 
-    if (config->eModel <= KeypadModel::BlinkRacepad) {
+    if (config->eModel <= KeypadModel::Blink13Key2Dial) {
         fnCheckMsg = CheckMsgBlinkMarine;
         fnGetTxMsg = GetTxMsgBlinkMarine;
         fnGetStartMsg = GetStartMsgBlinkMarine;
@@ -89,9 +89,8 @@ void Keypad::CheckTimeout()
     if (SYS_TIME - nLastRxTime > pConfig->nTimeout)
     {
         for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
-        {
             fVal[i] = 0;
-        }
+    
     }
 }
 

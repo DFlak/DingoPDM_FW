@@ -15,25 +15,15 @@ BlinkDial() {};
         pConfig = config;
     }
     
-    void Update(uint64_t data);
+    void CheckMsg(uint64_t data);
 
     void UpdateLeds();
-
-    bool GetCW(){ return bClockwise;}
-    bool GetCCW(){ return bCounterClockwise;}
-    uint8_t GetTicks(){ return nTicks;}
-    uint16_t GetEncoderTicks(){ return nEncoderTicks;}
-
-    uint8_t GetMaxEncoderTicks(){ return nMaxEncoderTicks;}
 
 private:
     Config_KeypadDial *pConfig;
 
-    bool bClockwise;
-    bool bCounterClockwise;
-    uint8_t nTicks;
+    uint8_t nCounter;
+    uint8_t nCounterMax;
 
-    uint16_t nEncoderTicks;
-
-    uint8_t nMaxEncoderTicks;
+    bool bLeds[16];
 };
