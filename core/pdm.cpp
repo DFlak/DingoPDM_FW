@@ -294,8 +294,8 @@ void InitVarMap()
     {
         pVarMap[index++] = &pf[i].fOutput;
         pVarMap[index++] = &pf[i].fCurrent;
-        pVarMap[index++] = &pf[i].nOvercurrent;
-        pVarMap[index++] = &pf[i].nFault;
+        pVarMap[index++] = &pf[i].fOvercurrent;
+        pVarMap[index++] = &pf[i].fFault;
     }
 
     // Flashers
@@ -317,24 +317,24 @@ void InitVarMap()
     }
 
     // Wiper
-    pVarMap[index++] = &wiper.nSlowOut;
-    pVarMap[index++] = &wiper.nFastOut;
-    pVarMap[index++] = &wiper.nParkOut;
-    pVarMap[index++] = &wiper.nInterOut;
-    pVarMap[index++] = &wiper.nWashOut;
-    pVarMap[index++] = &wiper.nSwipeOut;
+    pVarMap[index++] = &wiper.fSlowOut;
+    pVarMap[index++] = &wiper.fFastOut;
+    pVarMap[index++] = &wiper.fParkOut;
+    pVarMap[index++] = &wiper.fInterOut;
+    pVarMap[index++] = &wiper.fWashOut;
+    pVarMap[index++] = &wiper.fSwipeOut;
 
     // Keypads
     for (uint8_t i = 0; i < PDM_NUM_KEYPADS; i++)
     {
         for (uint8_t j = 0; j < KEYPAD_MAX_BUTTONS; j++)
         {
-            pVarMap[index++] = &keypad[i].fVal[j];
+            pVarMap[index++] = &keypad[i].fButtonVal[j];
         }
 
         for (uint8_t j = 0; j < KEYPAD_MAX_DIALS; j++)
         {
-            pVarMap[index++] = &keypad[i].nDialVal[j];
+            pVarMap[index++] = &keypad[i].fDialVal[j];
         }
 
         for (uint8_t j = 0; j < KEYPAD_MAX_ANALOG_INPUTS; j++)

@@ -139,7 +139,7 @@ CANTxFrame BacklightMsg(Keypad* kp)
     return msg;
 }
 
-} // anonymous namespace
+}
 
 void SetModelBlinkMarine(Keypad* kp)
 {
@@ -191,6 +191,15 @@ void SetModelBlinkMarine(Keypad* kp)
     {
         kp->nNumButtons = 0;
         kp->nNumDials = 0;
+    }
+
+    for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
+    {
+        kp->button[i].SetConfig(&kp->pConfig->stButton[i]);
+    }
+    for (uint8_t i = 0; i < KEYPAD_MAX_DIALS; i++)
+    {
+        kp->dial[i].SetConfig(&kp->pConfig->stDial[i]);
     }
 
     // Wire button function pointers for BlinkMarine LED behavior

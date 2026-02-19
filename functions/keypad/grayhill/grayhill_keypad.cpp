@@ -5,7 +5,7 @@
 namespace {
 
 // Grayhill LED indicator control
-// Uses CANopen RPDO format: nNodeId + 0x200 (RPDO1)
+// nNodeId + 0x200
 // Each byte controls one button LED (up to 8 in first message)
 // Value: 0=off, 1=on, 2=blink
 CANTxFrame IndicatorMsg(Keypad* kp)
@@ -29,7 +29,7 @@ CANTxFrame IndicatorMsg(Keypad* kp)
 }
 
 // Grayhill brightness control
-// Uses CANopen RPDO format: nNodeId + 0x300 (RPDO2)
+// nNodeId + 0x300
 // Byte 0: Button brightness (0-100%)
 // Byte 1: Backlight brightness (0-100%)
 CANTxFrame BrightnessMsg(Keypad* kp)
@@ -50,7 +50,7 @@ CANTxFrame BrightnessMsg(Keypad* kp)
     return msg;
 }
 
-} // anonymous namespace
+}
 
 void SetModelGrayhill(Keypad* kp)
 {
@@ -84,20 +84,23 @@ void SetModelGrayhill(Keypad* kp)
         kp->nNumDials = 0;
     }
 
-    // Wire button function pointers for Grayhill LED behavior
     for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
-        kp->button[i].SetBrand(UpdateLedGrayhill, GetLedStateGrayhill);
+    {
+        kp->button[i].SetConfig(&kp->pConfig->stButton[i]);
+    }
 }
 
 bool CheckMsgGrayhill(Keypad* kp, CANRxFrame frame)
 {
     // Grayhill uses CANopen TPDO format
-    // Button state message: nNodeId + 0x180 (TPDO1)
+    // nNodeId + 0x180
     // Byte 0-2: Button states (up to 20 buttons)
     if (frame.SID != kp->pConfig->nNodeId + 0x180)
         return false;
 
-    kp->nLastRxTime = SYS_TIME;
+    for(uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
+    
+        kp->fButtonVal[i] = kp->button[i].Update((frame.data8[i / 8] >> (i % 8)) & 0x01);
 
     // Grayhill button mapping - each bit represents a button
     // Buttons 0-7 in byte 0
@@ -131,6 +134,8 @@ bool CheckMsgGrayhill(Keypad* kp, CANRxFrame frame)
     kp->nDialVal[1] = 0;
     kp->nDialVal[2] = 0;
     kp->nDialVal[3] = 0;
+
+    kp->nLastRxTime = SYS_TIME;
 
     return true;
 }

@@ -170,8 +170,8 @@ void Profet::Update(bool bOutEnabled)
 
     // Set var map values
     fOutput = eState == ProfetState::On ? 1 : 0;
-    nOvercurrent = eState == ProfetState::Overcurrent ? 1 : 0;
-    nFault = eState == ProfetState::Fault ? 1 : 0;
+    fOvercurrent = eState == ProfetState::Overcurrent ? 1 : 0;
+    fFault = eState == ProfetState::Fault ? 1 : 0;
 
     palClearLine(LINE_E2);
 }
@@ -189,7 +189,9 @@ void Profet::FollowerUpdate()
     {
         pwm.Off();
         palClearLine(m_in);
-        fOutput = 0; nOvercurrent = 0; nFault = 1;
+        fOutput = 0; 
+        fOvercurrent = 0; 
+        fFault = 1;
         return;
     }
 
@@ -218,8 +220,8 @@ void Profet::FollowerUpdate()
     }
 
     fOutput = eState == ProfetState::On ? 1 : 0;
-    nOvercurrent = eState == ProfetState::Overcurrent ? 1 : 0;
-    nFault = 0;
+    fOvercurrent = eState == ProfetState::Overcurrent ? 1 : 0;
+    fFault = 0;
 }
 
 void Profet::HandleDsel()

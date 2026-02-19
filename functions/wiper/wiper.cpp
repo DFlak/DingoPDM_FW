@@ -66,10 +66,10 @@ void Wiper::Update()
 
     //Set var map values
     //Fast/Slow set in SetMotorSpeed()
-    nParkOut = eState == WiperState::Parked ? 1 : 0;
-    nInterOut = ((eState == WiperState::IntermittentOn) || (eState == WiperState::IntermittentPause)) ? 1 : 0;
-    nWashOut = (eState == WiperState::Wash) ? 1 : 0;
-    nSwipeOut = (eState == WiperState::Swipe) ? 1 : 0;
+    fParkOut = eState == WiperState::Parked ? 1 : 0;
+    fInterOut = ((eState == WiperState::IntermittentOn) || (eState == WiperState::IntermittentPause)) ? 1 : 0;
+    fWashOut = (eState == WiperState::Wash) ? 1 : 0;
+    fSwipeOut = (eState == WiperState::Swipe) ? 1 : 0;
 }
 
 void Wiper::Parking()
@@ -169,18 +169,18 @@ void Wiper::SetMotorSpeed(MotorSpeed speed)
     switch (speed)
     {
     case MotorSpeed::Off:
-        nSlowOut = 0;
-        nFastOut = 0;
+        fSlowOut = 0;
+        fFastOut = 0;
         break;
 
     case MotorSpeed::Slow:
-        nSlowOut = 1;
-        nFastOut = 0;
+        fSlowOut = 1;
+        fFastOut = 0;
         break;
 
     case MotorSpeed::Fast:
-        nSlowOut = 1;
-        nFastOut = 1;
+        fSlowOut = 1;
+        fFastOut = 1;
         break;
     }
     
@@ -188,9 +188,9 @@ void Wiper::SetMotorSpeed(MotorSpeed speed)
 
 MotorSpeed Wiper::GetMotorSpeed()
 {
-    if (nSlowOut && nFastOut)
+    if (fSlowOut && fFastOut)
         return MotorSpeed::Fast;
-    else if (nSlowOut)
+    else if (fSlowOut)
         return MotorSpeed::Slow;
     else
         return MotorSpeed::Off;

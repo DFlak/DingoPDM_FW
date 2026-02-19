@@ -28,6 +28,14 @@ static void KeypadThread(void *arg)
             if (!keypads[k].IsEnabled())
                 continue;
 
+            if (!keypads[k].bStartMsgSent) {
+                CANTxFrame startMsg = keypads[k].GetStartMsg();
+                if (startMsg.SID != 0) 
+                    PostTxFrame(&startMsg);   
+                keypads[k].bStartMsgSent = true;
+                chThdSleepMilliseconds(KEYPAD_TX_MSG_SPLIT);
+            }
+
             for (uint8_t i = 0; i < keypads[k].GetNumTxMsgs(); i++)
             {
                 CANTxFrame msg = keypads[k].GetTxMsg(i);
@@ -50,7 +58,7 @@ msg_t Keypad::InitThread(Keypad *keypads)
 void Keypad::SetConfig(Config_Keypad* config)
 {
     pConfig = config;
-    pDimmingInput = &pVarMap[config->nDimmingVar][0];
+    pDimmingInput = pVarMap[config->nDimmingVar];
 
     if (config->eModel <= KeypadModel::Blink13Key2Dial) {
         fnCheckMsg = CheckMsgBlinkMarine;
@@ -67,15 +75,6 @@ void Keypad::SetConfig(Config_Keypad* config)
     }
 
     fnSetModel(this);
-
-    for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
-    {
-        button[i].SetConfig(&pConfig->stButton[i]);
-    }
-    for (uint8_t i = 0; i < KEYPAD_MAX_DIALS; i++)
-    {
-        dial[i].SetConfig(&pConfig->stDial[i]);
-    }
 }
 
 void Keypad::CheckTimeout()
@@ -88,9 +87,13 @@ void Keypad::CheckTimeout()
 
     if (SYS_TIME - nLastRxTime > pConfig->nTimeout)
     {
+        // Timeout - reset values
         for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
-            fVal[i] = 0;
-    
+        {
+            fButtonVal[i] = 0;
+            fDialVal[i] = 0;
+            fAnalogVal[i] = 0;
+        }
     }
 }
 

@@ -20,7 +20,8 @@ using KeypadSetModelFn = void (*)(Keypad*);
 class Keypad
 {
 public:
-    Keypad() = default;
+    Keypad() {
+    };
 
     void SetConfig(Config_Keypad* config);
 
@@ -28,32 +29,36 @@ public:
 
     static msg_t InitThread(Keypad *keypads);
 
-    bool IsEnabled() const { return pConfig->bEnabled; }
     void CheckTimeout();
-
     bool CheckMsg(CANRxFrame frame);
+
     CANTxFrame GetTxMsg(uint8_t nIndex);
     CANTxFrame GetStartMsg();
     uint8_t GetNumTxMsgs() const { return nNumTxMsgs; }
 
+    bool IsEnabled() const { return pConfig->bEnabled; }
+
     // Var map data
-    float fVal[KEYPAD_MAX_BUTTONS];
-    float nDialVal[KEYPAD_MAX_DIALS];
+    float fButtonVal[KEYPAD_MAX_BUTTONS];
+    float fDialVal[KEYPAD_MAX_DIALS];
     float fAnalogVal[KEYPAD_MAX_ANALOG_INPUTS];
 
     Config_Keypad* pConfig = nullptr;
-    uint32_t nLastRxTime = 0;
     float* pDimmingInput = nullptr;
+
     KeypadButton button[KEYPAD_MAX_BUTTONS];
     KeypadDial dial[KEYPAD_MAX_DIALS];
     uint8_t nNumButtons = 0;
     uint8_t nNumDials = 0;
 
+    uint32_t nLastRxTime = 0;
+    bool bStartMsgSent = false;
+
 private:
     KeypadModel eLastModel = KeypadModel::Blink2Key;
     uint8_t nNumTxMsgs = 0;
 
-    // Function pointers - set by SetConfig based on model
+    // Function pointers - set by SetConfig based on brand
     KeypadCheckMsgFn fnCheckMsg = nullptr;
     KeypadGetTxMsgFn fnGetTxMsg = nullptr;
     KeypadGetStartMsgFn fnGetStartMsg = nullptr;

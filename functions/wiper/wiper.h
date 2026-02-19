@@ -57,12 +57,12 @@ public:
     WiperSpeed GetSpeed() { return eSelectedSpeed; }
     WiperState GetState() { return eState; }
 
-    float nSlowOut;
-    float nFastOut;
-    float nParkOut;
-    float nInterOut;
-    float nWashOut;
-    float nSwipeOut;
+    float fSlowOut;
+    float fFastOut;
+    float fParkOut;
+    float fInterOut;
+    float fWashOut;
+    float fSwipeOut;
 
 private:
     void Parking();

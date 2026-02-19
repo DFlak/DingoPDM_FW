@@ -95,8 +95,8 @@ public:
 
     float fOutput;
     float fCurrent;
-    float nOvercurrent;
-    float nFault;
+    float fOvercurrent;
+    float fFault;
 
 private:
     const uint16_t m_num;
