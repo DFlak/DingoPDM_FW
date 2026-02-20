@@ -6,23 +6,32 @@ namespace {
 
 // Grayhill LED indicator control
 // nNodeId + 0x200
-// Each byte controls one button LED (up to 8 in first message)
-// Value: 0=off, 1=on, 2=blink
 CANTxFrame IndicatorMsg(Keypad* kp)
 {
-    for (uint8_t i = 0; i < kp->nNumButtons; i++)
-        kp->button[i].UpdateLed();
-
     CANTxFrame msg;
     msg.SID = kp->pConfig->nNodeId + 0x200;
     msg.IDE = CAN_IDE_STD;
     msg.DLC = 8;
+    msg.data64[0] = 0;
 
-    // Grayhill uses single byte per LED with state value
-    // 0 = off, 1 = on, 2 = blink
-    for (uint8_t i = 0; i < 8 && i < kp->nNumButtons; i++)
+    // Grayhill stacks LED indicators (3 per button) in order
+    // Each LED state is 1 bit: 0 = off, 1 = on
+    // Byte 0: Button 0 LED 0-2, Button 1 LED 0-2, Button 2 LED 0-1
+    // Byte 1: Button 2 LED 2, Button 3 LED 0-2, Button 4 LED 0-2
+    // etc., up to max of 20 buttons (60 LEDs) across 8 bytes
+
+    uint8_t nBitPosition = 0;
+    for (uint8_t i = 0; i < kp->nNumButtons; i++)
     {
-        msg.data8[i] = kp->button[i].GetLedState();
+        if (nBitPosition >= 64) break;
+
+        uint8_t nLedValue = 0;
+        if (kp->button[i].bLed[0]) nLedValue |= 1; // Bit 0
+        if (kp->button[i].bLed[1]) nLedValue |= 2; // Bit 1
+        if (kp->button[i].bLed[2]) nLedValue |= 4; // Bit 2
+
+        msg.data64[0] |= ((uint64_t)nLedValue << nBitPosition);
+        nBitPosition += 3;
     }
 
     return msg;
@@ -54,40 +63,34 @@ CANTxFrame BrightnessMsg(Keypad* kp)
 
 void SetModelGrayhill(Keypad* kp)
 {
+    kp->nNumButtons = 0;
+    kp->nNumDials = 0; // Grayhill keypads don't have dials
+    kp->numAnalogInputs = 0; // Grayhill keypads don't have analog inputs
+
     switch (kp->pConfig->eModel)
     {
         case KeypadModel::Grayhill6Key:
             kp->nNumButtons = 6;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Grayhill8Key:
             kp->nNumButtons = 8;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Grayhill15Key:
             kp->nNumButtons = 15;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Grayhill20Key:
             kp->nNumButtons = 20;
-            kp->nNumDials = 0;
             break;
         default:
-            kp->nNumButtons = 0;
-            kp->nNumDials = 0;
             break;
-    }
-
-    if (!kp->pConfig->bEnabled)
-    {
-        kp->nNumButtons = 0;
-        kp->nNumDials = 0;
     }
 
     for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
-    {
         kp->button[i].SetConfig(&kp->pConfig->stButton[i]);
-    }
+
+    // Button function pointers for Grayhill LED behavior
+    for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
+        kp->button[i].SetBrand(UpdateButtonLedGrayhill);
 }
 
 bool CheckMsgGrayhill(Keypad* kp, CANRxFrame frame)
@@ -98,42 +101,8 @@ bool CheckMsgGrayhill(Keypad* kp, CANRxFrame frame)
     if (frame.SID != kp->pConfig->nNodeId + 0x180)
         return false;
 
-    for(uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
-    
-        kp->fButtonVal[i] = kp->button[i].Update((frame.data8[i / 8] >> (i % 8)) & 0x01);
-
-    // Grayhill button mapping - each bit represents a button
-    // Buttons 0-7 in byte 0
-    kp->fVal[0] = kp->button[0].Update(frame.data8[0] & 0x01);
-    kp->fVal[1] = kp->button[1].Update((frame.data8[0] & 0x02) >> 1);
-    kp->fVal[2] = kp->button[2].Update((frame.data8[0] & 0x04) >> 2);
-    kp->fVal[3] = kp->button[3].Update((frame.data8[0] & 0x08) >> 3);
-    kp->fVal[4] = kp->button[4].Update((frame.data8[0] & 0x10) >> 4);
-    kp->fVal[5] = kp->button[5].Update((frame.data8[0] & 0x20) >> 5);
-    kp->fVal[6] = kp->button[6].Update((frame.data8[0] & 0x40) >> 6);
-    kp->fVal[7] = kp->button[7].Update((frame.data8[0] & 0x80) >> 7);
-
-    // Buttons 8-15 in byte 1
-    kp->fVal[8] = kp->button[8].Update(frame.data8[1] & 0x01);
-    kp->fVal[9] = kp->button[9].Update((frame.data8[1] & 0x02) >> 1);
-    kp->fVal[10] = kp->button[10].Update((frame.data8[1] & 0x04) >> 2);
-    kp->fVal[11] = kp->button[11].Update((frame.data8[1] & 0x08) >> 3);
-    kp->fVal[12] = kp->button[12].Update((frame.data8[1] & 0x10) >> 4);
-    kp->fVal[13] = kp->button[13].Update((frame.data8[1] & 0x20) >> 5);
-    kp->fVal[14] = kp->button[14].Update((frame.data8[1] & 0x40) >> 6);
-    kp->fVal[15] = kp->button[15].Update((frame.data8[1] & 0x80) >> 7);
-
-    // Buttons 16-19 in byte 2
-    kp->fVal[16] = kp->button[16].Update(frame.data8[2] & 0x01);
-    kp->fVal[17] = kp->button[17].Update((frame.data8[2] & 0x02) >> 1);
-    kp->fVal[18] = kp->button[18].Update((frame.data8[2] & 0x04) >> 2);
-    kp->fVal[19] = kp->button[19].Update((frame.data8[2] & 0x08) >> 3);
-
-    // Grayhill keypads don't have dials
-    kp->nDialVal[0] = 0;
-    kp->nDialVal[1] = 0;
-    kp->nDialVal[2] = 0;
-    kp->nDialVal[3] = 0;
+    for(uint8_t i = 0; i < kp->nNumButtons; i++)
+        kp->fButtonVal[i] = kp->button[i].UpdateState((frame.data8[i / 8] >> (i % 8)) & 0x01);
 
     kp->nLastRxTime = SYS_TIME;
 

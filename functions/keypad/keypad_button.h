@@ -7,6 +7,9 @@ extern float *pVarMap[PDM_VAR_MAP_SIZE];
 
 class KeypadButton;
 
+// Function pointer types for brand-specific LED behavior
+using UpdateButtonLedFn = void (*)(KeypadButton*);
+
 class KeypadButton
 {
 public:
@@ -27,6 +30,28 @@ public:
     float *pLedVars[4] = {};
     float *pFaultLedVar = nullptr;
 
+    bool UpdateState(bool bNewVal);
+    void UpdateLedState()
+    {
+        if (fnUpdateButtonLed)
+            fnUpdateButtonLed(this);
+    }
+
+    void SetBrand(UpdateButtonLedFn updateFn)
+    {
+        fnUpdateButtonLed = updateFn;
+    }
+
+    //Blink Marine-specific LED state
+    BlinkMarineButtonColor eLedOnColor = BlinkMarineButtonColor::Off;
+    BlinkMarineButtonColor eLedBlinkColor = BlinkMarineButtonColor::Off;
+
+    //Grayhill specific LED state
+    bool bLed[3] = {false, false, false};
+
     Input input;
     bool bVal = false;    
+
+private:
+    UpdateButtonLedFn fnUpdateButtonLed = nullptr;
 };

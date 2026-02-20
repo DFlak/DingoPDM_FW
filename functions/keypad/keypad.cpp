@@ -60,7 +60,7 @@ void Keypad::SetConfig(Config_Keypad* config)
     pConfig = config;
     pDimmingInput = pVarMap[config->nDimmingVar];
 
-    if (config->eModel <= KeypadModel::Blink13Key2Dial) {
+    if (config->eModel <= KeypadModel::Blink15Key2Dial) {
         fnCheckMsg = CheckMsgBlinkMarine;
         fnGetTxMsg = GetTxMsgBlinkMarine;
         fnGetStartMsg = GetStartMsgBlinkMarine;
@@ -75,6 +75,14 @@ void Keypad::SetConfig(Config_Keypad* config)
     }
 
     fnSetModel(this);
+}
+
+void Keypad::Update()
+{
+    CheckTimeout();
+
+    for (uint8_t i = 0; i < nNumButtons; i++)
+        button[i].UpdateLedState();
 }
 
 void Keypad::CheckTimeout()

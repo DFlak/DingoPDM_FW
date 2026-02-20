@@ -29,7 +29,7 @@ public:
 
     static msg_t InitThread(Keypad *keypads);
 
-    void CheckTimeout();
+    void Update();
     bool CheckMsg(CANRxFrame frame);
 
     CANTxFrame GetTxMsg(uint8_t nIndex);
@@ -46,10 +46,15 @@ public:
     Config_Keypad* pConfig = nullptr;
     float* pDimmingInput = nullptr;
 
+    uint8_t nBacklightBrightness = 0;
+    uint8_t nDimBacklightBrightness = 0;
+    uint8_t nIndicatorBrightness = 0;
+
     KeypadButton button[KEYPAD_MAX_BUTTONS];
     KeypadDial dial[KEYPAD_MAX_DIALS];
     uint8_t nNumButtons = 0;
     uint8_t nNumDials = 0;
+    uint8_t numAnalogInputs = 0;
 
     uint32_t nLastRxTime = 0;
     bool bStartMsgSent = false;
@@ -57,6 +62,8 @@ public:
 private:
     KeypadModel eLastModel = KeypadModel::Blink2Key;
     uint8_t nNumTxMsgs = 0;
+
+    void CheckTimeout();
 
     // Function pointers - set by SetConfig based on brand
     KeypadCheckMsgFn fnCheckMsg = nullptr;

@@ -258,7 +258,7 @@ void CyclicUpdate()
         condition[i].Update();
 
     for (uint8_t i = 0; i < PDM_NUM_KEYPADS; i++)
-        keypad[i].CheckTimeout();
+        keypad[i].Update();
 }
 
 void InitVarMap()

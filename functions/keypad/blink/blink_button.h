@@ -4,6 +4,5 @@
 
 class KeypadButton;
 
-// BlinkMarine-specific LED behavior functions
-void UpdateLedBlinkMarine(KeypadButton* btn);
-uint8_t GetLedStateBlinkMarine(KeypadButton* btn);
+// BlinkMarine-specific behavior functions
+void UpdateButtonLedBlinkMarine(KeypadButton* btn);

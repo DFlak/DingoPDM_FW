@@ -231,7 +231,7 @@ enum class KeypadModel : uint8_t
     Blink10Key = 5,
     Blink12Key = 6,
     Blink15Key = 7,
-    Blink13Key2Dial = 8,
+    Blink15Key2Dial = 8,
     Grayhill1Key = 10,
     Grayhill6Key = 20,
     Grayhill8Key = 21,

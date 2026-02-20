@@ -216,12 +216,12 @@ bool GetWiperEnable()
 
 bool GetWiperFastOut()
 {
-    return wiper.nFastOut;
+    return wiper.fFastOut > 0.0f;
 }
 
 bool GetWiperSlowOut()
 {
-    return wiper.nSlowOut;
+    return wiper.fSlowOut > 0.0f;
 }
 
 WiperState GetWiperState()
@@ -317,7 +317,7 @@ uint32_t GetKeypadButtons(uint8_t nKeypad)
     uint32_t result = 0;
     
     for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++) {
-        result |= (((uint32_t)keypad[nKeypad].fVal[i] & 0x01) << i);
+        result |= (((uint32_t)keypad[nKeypad].fButtonVal[i] & 0x01) << i);
     }
     
     return result;
@@ -331,5 +331,5 @@ float GetKeypadDialVal(uint8_t nKeypad, uint8_t nDial)
     if (nDial >= KEYPAD_MAX_DIALS)
         return 0;
 
-    return keypad[nKeypad].nDialVal[nDial];
+    return keypad[nKeypad].fDialVal[nDial];
 }

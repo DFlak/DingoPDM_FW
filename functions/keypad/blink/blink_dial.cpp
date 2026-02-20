@@ -7,7 +7,7 @@ void BlinkDial::CheckMsg(uint64_t data)
     nCounterMax = (data & 0xFF000000) >> 24;
 }
 
-void BlinkDial::UpdateLeds()
+void BlinkDial::Update()
 {
 
     uint8_t nLedsToLight = (nCounter * 16 + nCounterMax - 1) / nCounterMax; // Round up division

@@ -1,7 +1,7 @@
 #include "blink_button.h"
 #include "keypad_button.h"
 
-void UpdateLedBlinkMarine(KeypadButton* btn)
+void UpdateButtonLedBlinkMarine(KeypadButton* btn)
 {
     if (!btn->pConfig->bEnabled)
         return;
@@ -45,15 +45,4 @@ void UpdateLedBlinkMarine(KeypadButton* btn)
 
     btn->eLedOnColor = eColor;
     btn->eLedBlinkColor = eBlinkColor;
-}
-
-uint8_t GetLedStateBlinkMarine(KeypadButton* btn)
-{
-    // BlinkMarine uses RGB colors, not simple state
-    // Return simple state for compatibility
-    if (btn->eLedOnColor == BlinkMarineButtonColor::Off)
-        return 0;
-    if (btn->eLedBlinkColor != BlinkMarineButtonColor::Off)
-        return 2;
-    return 1;
 }

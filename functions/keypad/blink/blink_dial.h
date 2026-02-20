@@ -8,7 +8,7 @@
 class BlinkDial
 {
 public:
-BlinkDial() {};
+    BlinkDial() {};
 
     void SetConfig(Config_KeypadDial *config)
     {
@@ -17,7 +17,15 @@ BlinkDial() {};
     
     void CheckMsg(uint64_t data);
 
-    void UpdateLeds();
+    void Update();
+
+    bool GetLedState(uint8_t nIndex)
+    {
+        if (nIndex >= 16)
+            return false;
+
+        return bLeds[nIndex];
+    }
 
 private:
     Config_KeypadDial *pConfig;

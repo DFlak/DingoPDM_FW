@@ -77,9 +77,6 @@ uint64_t BuildLedMsg(Keypad* kp, bool bBlink)
 
 CANTxFrame LedOnMsg(Keypad* kp)
 {
-    for (uint8_t i = 0; i < kp->nNumButtons; i++)
-        kp->button[i].UpdateLed();
-
     CANTxFrame msg;
     msg.SID = kp->pConfig->nNodeId + 0x200;
     msg.IDE = CAN_IDE_STD;
@@ -91,9 +88,6 @@ CANTxFrame LedOnMsg(Keypad* kp)
 
 CANTxFrame LedBlinkMsg(Keypad* kp)
 {
-    for (uint8_t i = 0; i < kp->nNumButtons; i++)
-        kp->button[i].UpdateLed();
-
     CANTxFrame msg;
     msg.SID = kp->pConfig->nNodeId + 0x300;
     msg.IDE = CAN_IDE_STD;
@@ -143,68 +137,54 @@ CANTxFrame BacklightMsg(Keypad* kp)
 
 void SetModelBlinkMarine(Keypad* kp)
 {
+    kp->nNumButtons = 0;
+    kp->nNumDials = 0;
+    kp->numAnalogInputs = 0;
+
     switch (kp->pConfig->eModel)
     {
         case KeypadModel::Blink2Key:
             kp->nNumButtons = 2;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Blink4Key:
             kp->nNumButtons = 4;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Blink5Key:
             kp->nNumButtons = 5;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Blink6Key:
             kp->nNumButtons = 6;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Blink8Key:
             kp->nNumButtons = 8;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Blink10Key:
             kp->nNumButtons = 10;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Blink12Key:
             kp->nNumButtons = 12;
-            kp->nNumDials = 0;
             break;
         case KeypadModel::Blink15Key:
             kp->nNumButtons = 15;
-            kp->nNumDials = 0;
             break;
-        case KeypadModel::Blink13Key2Dial:
-            kp->nNumButtons = 13;
+        case KeypadModel::Blink15Key2Dial:
+            kp->nNumButtons = 15;
             kp->nNumDials = 2;
+            kp->numAnalogInputs = 4;
             break;
         default:
-            kp->nNumButtons = 0;
-            kp->nNumDials = 0;
             break;
     }
 
-    if (!kp->pConfig->bEnabled)
-    {
-        kp->nNumButtons = 0;
-        kp->nNumDials = 0;
-    }
-
     for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
-    {
         kp->button[i].SetConfig(&kp->pConfig->stButton[i]);
-    }
-    for (uint8_t i = 0; i < KEYPAD_MAX_DIALS; i++)
-    {
-        kp->dial[i].SetConfig(&kp->pConfig->stDial[i]);
-    }
 
-    // Wire button function pointers for BlinkMarine LED behavior
+    for (uint8_t i = 0; i < KEYPAD_MAX_DIALS; i++)
+        kp->dial[i].SetConfig(&kp->pConfig->stDial[i]);
+
+    // Button function pointer for BlinkMarine LED behavior
     for (uint8_t i = 0; i < KEYPAD_MAX_BUTTONS; i++)
-        kp->button[i].SetBrand(UpdateLedBlinkMarine, GetLedStateBlinkMarine);
+        kp->button[i].SetBrand(UpdateButtonLedBlinkMarine);
 }
 
 bool CheckMsgBlinkMarine(Keypad* kp, CANRxFrame frame)
@@ -213,29 +193,30 @@ bool CheckMsgBlinkMarine(Keypad* kp, CANRxFrame frame)
     switch (frame.SID - kp->pConfig->nNodeId)
     {
         case (uint16_t)BlinkMarineMessageId::ButtonState:
-            
-            return true;
-        case (uint16_t)BlinkMarineMessageId::SetLed:
-            kp->nLastRxTime = SYS_TIME;
-            return true;
+            for(uint8_t i = 0; i < kp->nNumButtons; i++)
+            {
+                kp->fButtonVal[i] = kp->button[i].UpdateState((frame.data8[i / 8] >> (i % 8)) & 0x01);
+            }
+            break;
+    
         case (uint16_t)BlinkMarineMessageId::DialState1:
-            kp->nLastRxTime = SYS_TIME;
-            return true;
-        case (uint16_t)BlinkMarineMessageId::SetLedBlink:
-            kp->nLastRxTime = SYS_TIME;
-            return true;
+            kp->dial[0].CheckMsg(frame.data64[0]);
+            break;
+
         case (uint16_t)BlinkMarineMessageId::DialState2:
-            kp->nLastRxTime = SYS_TIME;
-            return true;
-        case (uint16_t)BlinkMarineMessageId::LedBrightness:
-            kp->nLastRxTime = SYS_TIME;
-            return true;
+            kp->dial[1].CheckMsg(frame.data64[0]);
+            break;
+
         case (uint16_t)BlinkMarineMessageId::AnalogInput:
-            kp->nLastRxTime = SYS_TIME;
-            return true;
-        case (uint16_t)BlinkMarineMessageId::Backlight:
-            kp->nLastRxTime = SYS_TIME;
-            return true;
+            for (uint8_t i = 0; i < kp->numAnalogInputs; i++)
+            {
+                uint16_t nRawVal = frame.data8[i * 2] + (frame.data8[i * 2 + 1] << 8);
+                kp->fAnalogVal[i] = static_cast<float>(nRawVal) * 0.01;
+            }
+            break;
+
+        default:
+            return false;
     }
 
     kp->nLastRxTime = SYS_TIME;
