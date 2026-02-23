@@ -164,6 +164,7 @@ CPPSRC = $(ALLCPPSRC) \
 				 wiper/wiper_mixin.cpp \
 				 wiper/wiper.cpp \
 				 hardware/mcp9808.cpp \
+				 hardware/ina3221.cpp \
 				 hardware/mb85rc.cpp \
 				 main.cpp
 

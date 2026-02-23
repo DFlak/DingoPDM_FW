@@ -64,3 +64,8 @@ uint16_t GetAdcRaw(AnalogChannel channel);
 float GetBattVolt();
 float GetTemperature();
 float GetVDDA();
+
+bool InitBoardTemp();
+float BoardReadTemp();
+bool IsBoardOverTemp();
+bool IsBoardCritTemp();

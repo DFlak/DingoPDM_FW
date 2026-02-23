@@ -105,11 +105,23 @@ struct SlowThread : chibios_rt::BaseStaticThread<256>
 
             fBattVolt = GetBattVolt();
 
-            // Temp sensor is I2C, takes a while to read
-            // Don't want to slow down main thread
-            fTempSensor = tempSensor.GetTemp();
-            bDeviceOverTemp = tempSensor.OverTempLimit();
-            bDeviceCriticalTemp = tempSensor.CritTempLimit();
+            fTempSensor = BoardReadTemp();
+            bDeviceOverTemp = IsBoardOverTemp();
+            bDeviceCriticalTemp = IsBoardCritTemp();
+
+#if PDM_TYPE == 2
+            // Read INA3221 current sensors and update Profet current values
+            // 5 sensors × 3 channels = 15 outputs
+            for (uint8_t sensor = 0; sensor < PDM_NUM_INA3221; sensor++)
+            {
+                for (uint8_t ch = 1; ch <= 3; ch++)
+                {
+                    uint8_t outIdx = sensor * 3 + (ch - 1);
+                    if (outIdx < PDM_NUM_OUTPUTS)
+                        pf[outIdx].SetExternalCurrent(currentSensor[sensor].GetCurrent(ch));
+                }
+            }
+#endif
 
             // palToggleLine(LINE_E2);
             chThdSleepMilliseconds(250);
@@ -134,14 +146,26 @@ void InitPdm()
 
     if(!InitAdc() == HAL_RET_SUCCESS)
         Error::SetFatalError(FatalErrorType::ErrADC, MsgSrc::Init);
-        
+
+#if PDM_TYPE == 2
+    if (!i2cStart(&I2CD2, &i2cConfig) == HAL_RET_SUCCESS)
+        Error::SetFatalError(FatalErrorType::ErrI2C, MsgSrc::Init);
+    if (!i2cStart(&I2CD3, &i2cConfig) == HAL_RET_SUCCESS)
+        Error::SetFatalError(FatalErrorType::ErrI2C, MsgSrc::Init);
+    for (uint8_t i = 0; i < PDM_NUM_INA3221; i++)
+    {
+        if (!currentSensor[i].Init())
+            Error::SetFatalError(FatalErrorType::ErrI2C, MsgSrc::Init);
+    }
+#endif
+
     if(!InitCan(&stConfig.stDevConfig) == HAL_RET_SUCCESS) // Starts CAN threads
         Error::SetFatalError(FatalErrorType::ErrCAN, MsgSrc::Init);
 
     if (!InitUsb() == HAL_RET_SUCCESS) // Starts USB threads
         Error::SetFatalError(FatalErrorType::ErrUSB, MsgSrc::Init);
 
-    if (!tempSensor.Init(BOARD_TEMP_WARN, BOARD_TEMP_CRIT))
+    if (!InitBoardTemp())
         Error::SetFatalError(FatalErrorType::ErrTempSensor, MsgSrc::Init);
 
     InitInfoMsgs();
@@ -275,8 +299,13 @@ void InitVarMap()
 
     // 1-2
     // Digital inputs
+#if PDM_NUM_INPUTS > 0
     pVarMap[1] = &in[0].nVal;
     pVarMap[2] = &in[1].nVal;
+#else
+    pVarMap[1] = const_cast<uint16_t*>(&ALWAYS_FALSE);
+    pVarMap[2] = const_cast<uint16_t*>(&ALWAYS_FALSE);
+#endif
 
     // 3-34
     // CAN Inputs
@@ -825,9 +854,11 @@ void EnterSleep()
 {
     // Set wakeup sources
 
+#if PDM_NUM_INPUTS > 0
     // Digital inputs change detection, with configured pullup or pulldown
     EnableLineEventWithPull(LINE_DI1, stConfig.stInput[0].ePull);
     EnableLineEventWithPull(LINE_DI2, stConfig.stInput[1].ePull);
+#endif
 
     // CAN receive detection
     palSetLineMode(LINE_CAN_RX, PAL_MODE_INPUT);

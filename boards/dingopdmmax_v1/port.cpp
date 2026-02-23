@@ -1,5 +1,7 @@
 #include "port.h"
 #include "mcu_utils.h"
+#include "hw_devices.h"
+#include "dingopdm_config.h"
 
 static const CANConfig canConfig1000 =
 {
@@ -134,4 +136,24 @@ float GetTemperature()
 float GetVDDA()
 {
     return ((float)STM32_VREF_INT_CAL / (float)GetAdcRaw(AnalogChannel::VRefInt)) * 3.3;
+}
+
+bool InitBoardTemp()
+{
+    return tempSensor.Init(BOARD_TEMP_WARN, BOARD_TEMP_CRIT);
+}
+
+float BoardReadTemp()
+{
+    return tempSensor.GetTemp();
+}
+
+bool IsBoardOverTemp()
+{
+    return tempSensor.OverTempLimit();
+}
+
+bool IsBoardCritTemp()
+{
+    return tempSensor.CritTempLimit();
 }

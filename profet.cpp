@@ -19,84 +19,91 @@ void Profet::Update(bool bOutEnabled)
     else
         eReqState = ProfetState::Off;
 
-    // Set DSEL pin to select the appropriate IS channel
-    // Only valid on 2 channel devices
-    // Wait for DSEL changeover and ADC conversion to complete
-    // DSEL changeover takes max ~60us
-    if (m_model == ProfetModel::BTS7008_2EPA_CH1)
+    // SimpleMOSFET: current is set externally via SetExternalCurrent()
+    // Skip DSEL, ADC reading, KILIS calculation, and ADC fault detection
+    if (m_model != ProfetModel::SimpleMOSFET)
     {
-        palClearLine(m_dsel);
-        chThdSleepMicroseconds(60);
-    }
-    else if (m_model == ProfetModel::BTS7008_2EPA_CH2)
-    {
-        palSetLine(m_dsel);
-        chThdSleepMicroseconds(60);
-    }
-
-    uint32_t nCNT = 0;
-    uint32_t nCCR = 0;
-
-    if (pwm.IsEnabled() && eState == ProfetState::On)
-    {
-        // Assign to local vars to prevent CNT rolling over and slipping past check
-        // Example:
-        // CCR = 2500
-        // When checking read delay CNT = 2499
-        // Before getting to the CNT < CCR check the CNT has rolled over to 0
-        // This will cause an incorrect reading
-        // Copying to local var freezes the CNT value
-        nCCR = m_pwmDriver->tim->CCR[static_cast<uint8_t>(m_pwmChannel)];
-        nCNT = m_pwmDriver->tim->CNT;
-
-        if ((nCCR > nPwmReadDelay) &&
-            (nCNT > nPwmReadDelay) &&
-            (nCNT < nCCR))
+        // Set DSEL pin to select the appropriate IS channel
+        // Only valid on 2 channel devices
+        // Wait for DSEL changeover and ADC conversion to complete
+        // DSEL changeover takes max ~60us
+        if (m_model == ProfetModel::BTS7008_2EPA_CH1)
         {
-            nIS = GetAdcRaw(m_ain);
-            nLastIS = nIS;
+            palClearLine(m_dsel);
+            chThdSleepMicroseconds(60);
+        }
+        else if (m_model == ProfetModel::BTS7008_2EPA_CH2)
+        {
+            palSetLine(m_dsel);
+            chThdSleepMicroseconds(60);
+        }
+
+        uint32_t nCNT = 0;
+        uint32_t nCCR = 0;
+
+        if (pwm.IsEnabled() && eState == ProfetState::On)
+        {
+            // Assign to local vars to prevent CNT rolling over and slipping past check
+            // Example:
+            // CCR = 2500
+            // When checking read delay CNT = 2499
+            // Before getting to the CNT < CCR check the CNT has rolled over to 0
+            // This will cause an incorrect reading
+            // Copying to local var freezes the CNT value
+            nCCR = m_pwmDriver->tim->CCR[static_cast<uint8_t>(m_pwmChannel)];
+            nCNT = m_pwmDriver->tim->CNT;
+
+            if ((nCCR > nPwmReadDelay) &&
+                (nCNT > nPwmReadDelay) &&
+                (nCNT < nCCR))
+            {
+                nIS = GetAdcRaw(m_ain);
+                nLastIS = nIS;
+            }
+            else
+            {
+                nIS = nLastIS;
+            }
         }
         else
+            nIS = GetAdcRaw(m_ain);
+
+        // Calculate current at ADC, multiply by kILIS ratio to get output current
+        // Analog value must be ready before reading to allow for conversion after DSEL change
+        // Use the measured VDDA value to calculate volts/step
+        // Current = (rawVal * (VDDA / 4095)) / 1.2k) * kILIS
+        // NOTE: IS is converted to nCurrent = A * 10
+        // Example: 0.1A = 1, 1.0A = 10, 10A = 100
+        nCurrent = (uint16_t)((((float)nIS * (GetVDDA() / 4095)) / 1200) * fKILIS);
+
+        // Ignore current less than a low value
+        // Not capable of measuring that low anyways
+        // Depending on the model the value changes
+        switch (m_model)
         {
-            nIS = nLastIS;
+        case ProfetModel::BTS7002_1EPP:
+            if (nCurrent <= 5) // 0.5A
+                nCurrent = 0;
+            break;
+        case ProfetModel::BTS7008_2EPA_CH1:
+        case ProfetModel::BTS7008_2EPA_CH2:
+            if (nCurrent <= 2) // 0.2A
+                nCurrent = 0;
+            break;
+        case ProfetModel::BTS70012_1ESP:
+            if (nCurrent <= 10) // 1.0A
+                nCurrent = 0;
+            break;
+        default:
+            break;
         }
-    }
-    else
-        nIS = GetAdcRaw(m_ain);
 
-    // Calculate current at ADC, multiply by kILIS ratio to get output current
-    // Analog value must be ready before reading to allow for conversion after DSEL change
-    // Use the measured VDDA value to calculate volts/step
-    // Current = (rawVal * (VDDA / 4095)) / 1.2k) * kILIS
-    // NOTE: IS is converted to nCurrent = A * 10
-    // Example: 0.1A = 1, 1.0A = 10, 10A = 100
-    nCurrent = (uint16_t)((((float)nIS * (GetVDDA() / 4095)) / 1200) * fKILIS);
-
-    // Ignore current less than a low value
-    // Not capable of measuring that low anyways
-    // Depending on the model the value changes
-    switch (m_model)
-    {
-    case ProfetModel::BTS7002_1EPP:
-        if (nCurrent <= 5) // 0.5A
-            nCurrent = 0;
-        break;
-    case ProfetModel::BTS7008_2EPA_CH1:
-    case ProfetModel::BTS7008_2EPA_CH2:
-        if (nCurrent <= 2) // 0.2A
-            nCurrent = 0;
-        break;
-    case ProfetModel::BTS70012_1ESP:
-        if (nCurrent <= 10) // 1.0A
-            nCurrent = 0;
-        break;
-    }
-
-    // Check for fault (device overcurrent/overtemp/short)
-    // Raw ADC current reading will be very high
-    if (nIS > 30000)
-    {
-        eState = ProfetState::Fault;
+        // Check for fault (device overcurrent/overtemp/short)
+        // Raw ADC current reading will be very high
+        if (nIS > 30000)
+        {
+            eState = ProfetState::Fault;
+        }
     }
 
     bInRushActive = (pConfig->nInrushTime + nInRushOnTime) > SYS_TIME;

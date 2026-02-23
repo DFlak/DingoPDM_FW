@@ -2,7 +2,7 @@
 
 void Pwm::Update()
 {
-    bChannelEnabled = (bool)(m_pwm->enabled & (1 << 0));
+    bChannelEnabled = (bool)(m_pwm->enabled & (1 << static_cast<uint8_t>(m_pwmCh)));
 
     if (!pConfig->bEnabled || !bChannelEnabled) {
         bLastChannelEnabled = bChannelEnabled;
@@ -96,7 +96,7 @@ void Pwm::On()
 
 void Pwm::Off()
 {
-    pwmDisablePeriodicNotification(m_pwm);
+    pwmDisableChannelNotification(m_pwm, static_cast<uint8_t>(m_pwmCh));
     pwmDisableChannel(m_pwm, static_cast<uint8_t>(m_pwmCh));
 }
 

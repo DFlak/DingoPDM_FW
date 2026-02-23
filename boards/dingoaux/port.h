@@ -3,10 +3,10 @@
 #include "hal.h"
 #include "enums.h"
 
-#define PDM_TYPE 0 //0 = PDM, 1 = PDM-MAX 
+#define PDM_TYPE 2 //0 = PDM, 1 = PDM-MAX, 2 = AUX
 
-#define PDM_NUM_OUTPUTS 8
-#define PDM_NUM_INPUTS 2
+#define PDM_NUM_OUTPUTS 15
+#define PDM_NUM_INPUTS 0
 #define PDM_NUM_VIRT_INPUTS 16
 #define PDM_NUM_CAN_INPUTS 32
 #define PDM_NUM_FLASHERS 4
@@ -19,12 +19,20 @@
 
 #define PDM_NUM_TX_MSGS 16
 
-#define ADC1_NUM_CHANNELS 8
+#define PDM_NUM_THERMISTORS 4
+#define PDM_NUM_INA3221 5
+
+#define ADC1_NUM_CHANNELS 7
 #define ADC1_BUF_DEPTH 1
 
-#define BTS7002_1EPP_KILIS 229500
-#define BTS7008_2EPA_KILIS 59500
-#define BTS70012_1ESP_KILIS 350000
+// NCP18XH103F03RB thermistor parameters
+#define THERM_R_REF 10000.0f    // Reference resistance at 25C (10K)
+#define THERM_T_REF 298.15f     // Reference temperature in Kelvin (25C)
+#define THERM_BETA 3455.0f      // B25/100 value
+#define THERM_R_PULLUP 10000.0f // Pullup resistor value (10K)
+
+// INA3221 shunt resistance
+#define INA3221_SHUNT_R 0.001f  // 1mOhm
 
 #define SLEEP_TIMEOUT 30000
 
@@ -32,14 +40,13 @@
 
 static const uint16_t ALWAYS_FALSE = 0;
 static const uint16_t ALWAYS_TRUE = 1;
- 
+
 enum class AnalogChannel
 {
-    IS1 = 0,
-    IS2,
-    IS3_4,
-    IS5_6,
-    IS7_8,
+    Therm1 = 0,
+    Therm2,
+    Therm3,
+    Therm4,
     BattVolt,
     TempSensor,
     VRefInt
@@ -65,6 +72,8 @@ uint16_t GetAdcRaw(AnalogChannel channel);
 float GetBattVolt();
 float GetTemperature();
 float GetVDDA();
+
+float GetThermistorTemp(AnalogChannel channel);
 
 bool InitBoardTemp();
 float BoardReadTemp();

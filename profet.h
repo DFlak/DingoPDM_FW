@@ -37,23 +37,27 @@ public:
             m_pwmDriver(pwmDriver), m_pwmCfg(pwmCfg), m_pwmChannel(pwmCh),
             pwm(pwmDriver, pwmCfg, pwmCh)
     {
-        // Always on
-        palSetLine(m_den);
-
         switch (model)
         {
         case ProfetModel::BTS7002_1EPP:
+            palSetLine(m_den);
             fKILIS = BTS7002_1EPP_KILIS;
             nPwmReadDelay = PWM_READ_DELAY_SINGLE_CH;
             break;
         case ProfetModel::BTS7008_2EPA_CH1:
         case ProfetModel::BTS7008_2EPA_CH2:
+            palSetLine(m_den);
             fKILIS = BTS7008_2EPA_KILIS;
             nPwmReadDelay = PWM_READ_DELAY_DOUBLE_CH;
             break;
         case ProfetModel::BTS70012_1ESP:
+            palSetLine(m_den);
             fKILIS = BTS70012_1ESP_KILIS;
             nPwmReadDelay = PWM_READ_DELAY_SINGLE_CH;
+            break;
+        case ProfetModel::SimpleMOSFET:
+            fKILIS = 0;
+            nPwmReadDelay = 0;
             break;
         }
     }
@@ -69,6 +73,7 @@ public:
     void Update(bool bOutEnabled);
 
     uint16_t GetCurrent() { return nCurrent; }
+    void SetExternalCurrent(uint16_t current) { nCurrent = current; }
     ProfetState GetState() { return eState; }
     uint16_t GetOcCount() { return nOcCount; }
     uint8_t GetDutyCycle()
