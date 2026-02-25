@@ -240,12 +240,12 @@
 /*
  * PWM driver system settings.
  */
-#define STM32_PWM_USE_TIM1                  FALSE
-#define STM32_PWM_USE_TIM2                  FALSE
+#define STM32_PWM_USE_TIM1                  TRUE
+#define STM32_PWM_USE_TIM2                  TRUE
 #define STM32_PWM_USE_TIM3                  TRUE
 #define STM32_PWM_USE_TIM4                  TRUE
-#define STM32_PWM_USE_TIM5                  TRUE
-#define STM32_PWM_USE_TIM8                  FALSE
+#define STM32_PWM_USE_TIM5                  FALSE
+#define STM32_PWM_USE_TIM8                  TRUE
 #define STM32_PWM_USE_TIM9                  TRUE
 #define STM32_PWM_USE_TIM10                 TRUE
 #define STM32_PWM_USE_TIM11                 TRUE
@@ -369,5 +369,26 @@
  * WDG driver system settings.
  */
 #define STM32_WDG_USE_IWDG                  FALSE
+
+#ifdef DINGOAUX_BOARD
+#undef STM32_PWM_USE_TIM1
+#define STM32_PWM_USE_TIM1                  TRUE
+#undef STM32_PWM_USE_TIM2
+#define STM32_PWM_USE_TIM2                  TRUE
+#undef STM32_PWM_USE_TIM5
+#define STM32_PWM_USE_TIM5                  FALSE
+#undef STM32_PWM_USE_TIM8
+#define STM32_PWM_USE_TIM8                  TRUE
+#undef STM32_PWM_USE_TIM9
+#define STM32_PWM_USE_TIM9                  FALSE
+#undef STM32_PWM_USE_TIM10
+#define STM32_PWM_USE_TIM10                 FALSE
+#undef STM32_PWM_USE_TIM11
+#define STM32_PWM_USE_TIM11                 FALSE
+#undef STM32_PWM_USE_TIM13
+#define STM32_PWM_USE_TIM13                 FALSE
+#undef STM32_ST_USE_TIMER
+#define STM32_ST_USE_TIMER                  5
+#endif
 
 #endif /* MCUCONF_H */

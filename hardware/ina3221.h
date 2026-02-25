@@ -21,6 +21,49 @@
 // Shunt voltage LSB = 40uV
 #define INA3221_SHUNT_LSB_UV       40
 
+enum class INA3221Averaging : uint16_t {
+    AVG_1    = 0,
+    AVG_4    = 1,
+    AVG_16   = 2,
+    AVG_64   = 3,
+    AVG_128  = 4,
+    AVG_256  = 5,
+    AVG_512  = 6,
+    AVG_1024 = 7
+};
+
+enum class INA3221ConvTime : uint16_t {
+    CT_140US  = 0,
+    CT_204US  = 1,
+    CT_332US  = 2,
+    CT_588US  = 3,
+    CT_1100US = 4,
+    CT_2116US = 5,
+    CT_4156US = 6,
+    CT_8244US = 7
+};
+
+enum class INA3221Mode : uint16_t {
+    POWER_DOWN           = 0,
+    SHUNT_TRIGGERED      = 1,
+    BUS_TRIGGERED        = 2,
+    SHUNT_BUS_TRIGGERED  = 3,
+    POWER_DOWN_2         = 4,
+    SHUNT_CONTINUOUS     = 5,
+    BUS_CONTINUOUS       = 6,
+    SHUNT_BUS_CONTINUOUS = 7
+};
+
+struct INA3221Config {
+    bool ch1_en = true;
+    bool ch2_en = true;
+    bool ch3_en = true;
+    INA3221Averaging avg = INA3221Averaging::AVG_1;
+    INA3221ConvTime vbus_ct = INA3221ConvTime::CT_1100US;
+    INA3221ConvTime vsh_ct = INA3221ConvTime::CT_1100US;
+    INA3221Mode mode = INA3221Mode::SHUNT_BUS_CONTINUOUS;
+};
+
 class INA3221
 {
     public:
@@ -33,6 +76,7 @@ class INA3221
 
         bool Init();
         bool CheckId();
+        bool Configure(const INA3221Config& config);
 
         // Get current for a channel (1-3) in Profet format (A * 10)
         uint16_t GetCurrent(uint8_t channel);
@@ -50,4 +94,5 @@ class INA3221
         i2cflags_t lastErrors;
 
         bool Read16(uint8_t reg, uint16_t* val);
+        bool Write16(uint8_t reg, uint16_t val);
 };

@@ -194,6 +194,10 @@ CPPWARN = -Wall -Wextra -Wundef
 # List all user C define here, like -D_DEBUG=1
 UDEFS = 
 
+ifeq ($(BOARD),dingoaux)
+	UDEFS += -DDINGOAUX_BOARD
+endif
+
 # Define ASM defines here
 UADEFS = 
 

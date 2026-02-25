@@ -20,6 +20,40 @@ bool INA3221::Read16(uint8_t reg, uint16_t* val)
     return true;
 }
 
+bool INA3221::Write16(uint8_t reg, uint16_t val)
+{
+    uint8_t txBuf[3];
+    txBuf[0] = reg;
+    txBuf[1] = (val >> 8) & 0xFF; // INA3221 is big-endian
+    txBuf[2] = val & 0xFF;
+
+    i2cAcquireBus(m_driver);
+    msg_t ret = i2cMasterTransmitTimeout(m_driver, m_addr, txBuf, 3, nullptr, 0, TIME_MS2I(INA3221_TIMEOUT));
+    if (ret != MSG_OK) {
+        lastErrors = i2cGetErrors(m_driver);
+        i2cReleaseBus(m_driver);
+        return false;
+    }
+    i2cReleaseBus(m_driver);
+    return true;
+}
+
+bool INA3221::Configure(const INA3221Config& config)
+{
+    uint16_t reg = 0;
+    
+    if (config.ch1_en) reg |= (1 << 14);
+    if (config.ch2_en) reg |= (1 << 13);
+    if (config.ch3_en) reg |= (1 << 12);
+    
+    reg |= (static_cast<uint16_t>(config.avg) << 9);
+    reg |= (static_cast<uint16_t>(config.vbus_ct) << 6);
+    reg |= (static_cast<uint16_t>(config.vsh_ct) << 3);
+    reg |= static_cast<uint16_t>(config.mode);
+
+    return Write16(INA3221_REG_CONFIG, reg);
+}
+
 bool INA3221::Init()
 {
     return CheckId();

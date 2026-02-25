@@ -60,8 +60,9 @@ bool GetAnyFault();
 bool CheckEnterSleep();
 void EnterSleep();
 void EnableLineEventWithPull(ioline_t line, InputPull pull);
+static void PowerDownAllOutputs();
 #if PDM_TYPE == 2
-static void I2C2BusRecovery();
+static void I2CBusRecovery(ioline_t sclLine, ioline_t sdaLine);
 #endif
 
 static InfoMsg StateRunMsg(MsgType::Info, MsgSrc::State_Run);
@@ -112,22 +113,25 @@ struct SlowThread : chibios_rt::BaseStaticThread<256>
             bDeviceCriticalTemp = IsBoardCritTemp();
 
 #if PDM_TYPE == 2
-            // Read I2CD2 sensors (I2CD2 is active at start of each cycle)
-            for (uint8_t sensor = 0; sensor < PDM_NUM_INA3221_I2CD2; sensor++)
+static const uint8_t outputMapping[PDM_NUM_INA3221][3] = {
+    // sensor 0 (0x40, I2C2)
+    {5, 6, 7}, // ch1->OUT6, ch2->OUT7, ch3->OUT8
+    // sensor 1 (0x42, I2C2)
+    {2, 3, 4}, // ch1->OUT3, ch2->OUT4, ch3->OUT5
+    // sensor 2 (0x43, I2C2)
+    {0, 1, 8}, // ch1->OUT1, ch2->OUT2, ch3->OUT9
+    // sensor 3 (0x42, I2C3)
+    {14, 13, 12}, // ch1->OUT15, ch2->OUT14, ch3->OUT13
+    // sensor 4 (0x43, I2C3)
+    {11, 10, 9}, // ch1->OUT12, ch2->OUT11, ch3->OUT10
+};
+
+            // Read sensors in a clean loop
+            for (uint8_t sensor = 0; sensor < PDM_NUM_INA3221; sensor++)
             {
                 for (uint8_t ch = 1; ch <= 3; ch++)
                 {
-                    uint8_t outIdx = sensor * 3 + (ch - 1);
-                    if (outIdx < PDM_NUM_OUTPUTS)
-                        pf[outIdx].SetExternalCurrent(currentSensor[sensor].GetCurrent(ch));
-                }
-            }
-            // Read I2CD3 sensors
-            for (uint8_t sensor = PDM_NUM_INA3221_I2CD2; sensor < PDM_NUM_INA3221; sensor++)
-            {
-                for (uint8_t ch = 1; ch <= 3; ch++)
-                {
-                    uint8_t outIdx = sensor * 3 + (ch - 1);
+                    uint8_t outIdx = outputMapping[sensor][ch - 1];
                     if (outIdx < PDM_NUM_OUTPUTS)
                         pf[outIdx].SetExternalCurrent(currentSensor[sensor].GetCurrent(ch));
                 }
@@ -142,53 +146,47 @@ static SlowThread slowThread;
 static chibios_rt::ThreadReference slowThreadRef;
 
 #if PDM_TYPE == 2
-// Attempt to recover a stuck I2C2 slave holding SDA low.
+// Attempt to recover a stuck I2C slave holding SDA low.
 // Bit-bangs SCL up to 9 times so any slave mid-byte can finish outputting,
 // then generates a STOP condition to return the bus to idle.
-// Must be called before every i2cStart(&I2CD2, ...).
-// Recover the I2C2 bus by bit-banging SCL 9 times and generating a STOP.
-// Called unconditionally before AND after every i2cStart(&I2CD2):
-//   - Before: clears any slave stuck from a previous incomplete transaction.
-//   - After:  clears any slave confusion caused by the SWRST inside i2c_lld_start,
-//             which on STM32F4 in master mode drives SDA and SCL LOW. When SWRST
-//             is then cleared both lines rise simultaneously (not a clean STOP),
-//             potentially leaving a slave mid-byte and holding SDA low (BUSY=1).
-// Safe to call while I2CD2 has PE=1 (READY, no transaction in flight): pins
-// are temporarily taken from AF to GPIO and returned; the peripheral resumes
-// monitoring with the corrected bus state and BUSY clears once SDA is HIGH.
-static void I2C2BusRecovery()
+static void I2CBusRecovery(ioline_t sclLine, ioline_t sdaLine)
 {
     // Take direct control of the pins as open-drain GPIO outputs
-    palSetLineMode(LINE_I2C2_SCL, PAL_MODE_OUTPUT_OPENDRAIN);
-    palSetLineMode(LINE_I2C2_SDA, PAL_MODE_OUTPUT_OPENDRAIN);
-    palSetLine(LINE_I2C2_SCL);
-    palSetLine(LINE_I2C2_SDA);
+    palSetLineMode(sclLine, PAL_MODE_OUTPUT_OPENDRAIN);
+    palSetLineMode(sdaLine, PAL_MODE_OUTPUT_OPENDRAIN);
+    palSetLine(sclLine);
+    palSetLine(sdaLine);
     chThdSleepMicroseconds(10);
 
     // Always clock SCL 9 times: frees any slave stuck mid-byte regardless
-    // of whether SDA currently reads low (it may appear high momentarily
-    // due to the SCL edge that occurred when switching from AF to GPIO).
+    // of whether SDA currently reads low.
     for (uint8_t i = 0; i < 9; i++)
     {
-        palClearLine(LINE_I2C2_SCL);
+        palClearLine(sclLine);
         chThdSleepMicroseconds(5);
-        palSetLine(LINE_I2C2_SCL);
+        palSetLine(sclLine);
         chThdSleepMicroseconds(5);
     }
 
     // Generate a proper STOP: SDA low -> SCL high -> SDA high
-    palClearLine(LINE_I2C2_SDA);
+    palClearLine(sdaLine);
     chThdSleepMicroseconds(5);
-    palSetLine(LINE_I2C2_SCL);
+    palSetLine(sclLine);
     chThdSleepMicroseconds(5);
-    palSetLine(LINE_I2C2_SDA);
+    palSetLine(sdaLine);
     chThdSleepMicroseconds(10);
 
-    // Restore pins to AF mode for the I2C2 peripheral
-    palSetLineMode(LINE_I2C2_SCL, PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN);
-    palSetLineMode(LINE_I2C2_SDA, PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN);
+    // Restore pins to AF mode for the I2C peripheral
+    palSetLineMode(sclLine, PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN);
+    palSetLineMode(sdaLine, PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN);
 }
 #endif
+
+static void PowerDownAllOutputs()
+{
+    for (uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
+        pf[i].Update(false);
+}
 
 void InitPdm()
 {
@@ -207,36 +205,32 @@ void InitPdm()
         Error::SetFatalError(FatalErrorType::ErrADC, MsgSrc::Init);
 
 #if PDM_TYPE == 2
-    // I2CD2 and I2CD3 can run simultaneously now that DMA streams are non-conflicting.
     bool i2cInitOk = true;
 
-    I2C2BusRecovery();
-    if (i2cStart(&I2CD2, &i2cConfig) != HAL_RET_SUCCESS)
-        Error::SetFatalError(FatalErrorType::ErrI2C, MsgSrc::Init);
-    I2C2BusRecovery(); // clear any SWRST-induced slave confusion
+    // Start I2C2 and apply bus recovery
+    I2CBusRecovery(LINE_I2C2_SCL, LINE_I2C2_SDA);
+    if (i2cStart(&I2CD2, &i2cConfig) != HAL_RET_SUCCESS) i2cInitOk = false;
+    I2CBusRecovery(LINE_I2C2_SCL, LINE_I2C2_SDA); // clear any SWRST-induced slave confusion
 
-    if (i2cStart(&I2CD3, &i2cConfig) != HAL_RET_SUCCESS)
-        Error::SetFatalError(FatalErrorType::ErrI2C, MsgSrc::Init);
+    // Start I2C3 and apply bus recovery
+    I2CBusRecovery(LINE_I2C3_SCL, LINE_I2C3_SDA);
+    if (i2cStart(&I2CD3, &i2cConfig) != HAL_RET_SUCCESS) i2cInitOk = false;
+    I2CBusRecovery(LINE_I2C3_SCL, LINE_I2C3_SDA);
 
-    for (uint8_t i = 0; i < PDM_NUM_INA3221_I2CD2; i++)
+    // Initialize all INA3221 sensors in a clean loop
+    for (uint8_t i = 0; i < PDM_NUM_INA3221; i++)
     {
+        I2CDriver* bus = (i < PDM_NUM_INA3221_I2CD2) ? &I2CD2 : &I2CD3;
+        ioline_t scl = (i < PDM_NUM_INA3221_I2CD2) ? LINE_I2C2_SCL : LINE_I2C3_SCL;
+        ioline_t sda = (i < PDM_NUM_INA3221_I2CD2) ? LINE_I2C2_SDA : LINE_I2C3_SDA;
+
         if (!currentSensor[i].Init())
         {
             i2cInitOk = false;
-            i2cStop(&I2CD2);
-            I2C2BusRecovery();
-            i2cStart(&I2CD2, &i2cConfig);
-            I2C2BusRecovery(); // clear any SWRST-induced slave confusion
-        }
-    }
-
-    for (uint8_t i = PDM_NUM_INA3221_I2CD2; i < PDM_NUM_INA3221; i++)
-    {
-        if (!currentSensor[i].Init())
-        {
-            i2cInitOk = false;
-            i2cStop(&I2CD3);
-            i2cStart(&I2CD3, &i2cConfig);
+            i2cStop(bus);
+            I2CBusRecovery(scl, sda);
+            i2cStart(bus, &i2cConfig);
+            I2CBusRecovery(scl, sda); // clear any SWRST-induced slave confusion
         }
     }
 
@@ -265,10 +259,7 @@ void States()
 {
     if (bDeviceCriticalTemp)
     {
-        //Turn off all outputs
-        for (uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
-            pf[i].Update(false);
-            
+        PowerDownAllOutputs();
         Error::SetFatalError(FatalErrorType::ErrTemp, MsgSrc::State_Overtemp);
     }
 
@@ -321,12 +312,7 @@ void States()
 
     if (eState == PdmState::Error)
     {
-        // Not required?
-
-        //Turn off all outputs
-        for (uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
-            pf[i].Update(false);
-
+        PowerDownAllOutputs();
         Error::SetFatalError(eError, MsgSrc::State_Error);
     }
 
@@ -966,3 +952,4 @@ void EnterSleep()
 
     EnterStopMode();
 }
+

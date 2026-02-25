@@ -1,3 +1,13 @@
+FIRMWARE NOTES:
+- Outputs 8, 9, and 10 were moved to PWM-capable pins.
+  - OUT8: PB2 -> PD12 (TIM4_CH1)
+  - OUT9: PB12 -> PD13 (TIM4_CH2)
+  - OUT10: PB13 -> PD14 (TIM4_CH3)
+- The original pins (PB2, PB12, PB13) are not PWM-capable and cannot be used with the current firmware architecture. This should be corrected in the next PCB revision.
+- Digital inputs are not defined in this revision as per the note below.
+
+---
+
 The STM32F446 hardware only maps I2C3 RX to DMA1 Stream 2 
 (as defined in stm32_registry.h line 275). 
 The config had Stream 1, which is invalid.
@@ -21,9 +31,9 @@ OUT4: PA10
 OUT5: PA15
 OUT6: PB0
 OUT7: PB1
-OUT8: PB2
-OUT9: PB12
-OUT10: PB13
+OUT8: PD12
+OUT9: PD13
+OUT10: PD14
 OUT11: PB14
 OUT12: PB15
 OUT13: PC6
@@ -39,7 +49,7 @@ OUT5 - CH3 INA3221 ON I2C2 ADDR 0x42
 OUT6 - CH1 INA3221 ON I2C2 ADDR 0x40 
 OUT7 - CH2 INA3221 ON I2C2 ADDR 0x40
 OUT8 - CH3 INA3221 ON I2C2 ADDR 0x40
-OUT9 - CH3 INA3221 ON I2C2 ADDR ADDR 0x43 
+OUT9 - CH3 INA3221 ON I2C2 ADDR 0x43 
 OUT10 - CH3 INA3221 ON I2C3 ADDR 0x43
 OUT11 - CH2 INA3221 ON I2C3 ADDR 0x43
 OUT12 - CH1 INA3221 ON I2C3 ADDR 0x43
@@ -48,9 +58,11 @@ OUT14 - CH2 INA3221 ON I2C3 ADDR 0x42
 OUT15 - CH1 INA3221 ON I2C3 ADDR 0x42
 
 INPUTS:
-FOR NOW FORGET ABOUT INPUTS, I WIRED THEM WRONG AND THEY WON'T WORK ON THIS REVISION
+FOR NOW FORGET ABOUT DIGITAL INPUTS, I WIRED THEM WRONG AND THEY WON'T WORK ON THIS REVISION
 
-CAN:
+BATT SENSE: PA3 with a divider to battery with 4.7k and 47k resistors
+
+CAN PCA82C250:
 RX: PB8
 TX: PB9
 STANDBY: PC12

@@ -104,7 +104,7 @@ void CanRxThread(void *)
                 usbTx.data8[i] = msg.data8[i];
             res = PostTxUsbFrame(&usbTx);
 
-            palToggleLine(LINE_E2);
+            palToggleLine(LINE_LED_ERROR);
             // TODO:What to do if mailbox is full?
         }
 

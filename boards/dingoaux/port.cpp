@@ -82,12 +82,12 @@ static const ADCConversionGroup adc1_cfg = {
     .ltr = 0,
     .sqr1 = 0,
     .sqr2 = ADC_SQR2_SQ7_N(ADC_CHANNEL_VREFINT),
-    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4)  |
-            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN5)  |
-            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN6)  |
-            ADC_SQR3_SQ4_N(ADC_CHANNEL_IN7)  |
-            ADC_SQR3_SQ5_N(ADC_CHANNEL_IN3)  |
-            ADC_SQR3_SQ6_N(ADC_CHANNEL_SENSOR)
+    .sqr3 = ADC_SQR3_SQ1_N(ADC_CHANNEL_IN4)  | // Therm1
+            ADC_SQR3_SQ2_N(ADC_CHANNEL_IN5)  | // Therm2
+            ADC_SQR3_SQ3_N(ADC_CHANNEL_IN6)  | // Therm3
+            ADC_SQR3_SQ4_N(ADC_CHANNEL_IN7)  | // Therm4
+            ADC_SQR3_SQ5_N(ADC_CHANNEL_IN3)  | // BattVolt
+            ADC_SQR3_SQ6_N(ADC_CHANNEL_SENSOR) // Internal TempSensor
     };
 
 msg_t InitAdc()
@@ -203,3 +203,4 @@ bool IsBoardCritTemp()
 {
     return BoardReadTemp() > BOARD_TEMP_CRIT;
 }
+

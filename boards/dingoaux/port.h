@@ -21,7 +21,7 @@
 
 #define PDM_NUM_THERMISTORS 4
 #define PDM_NUM_INA3221 5
-#define PDM_NUM_INA3221_I2CD2 3  // sensors 0-1 on I2CD2
+#define PDM_NUM_INA3221_I2CD2 3  // sensors 0-2 on I2CD2
 #define PDM_NUM_INA3221_I2CD3 2  // sensors 3-4 on I2CD3
 
 #define ADC1_NUM_CHANNELS 7
