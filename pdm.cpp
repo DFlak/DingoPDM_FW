@@ -60,6 +60,9 @@ bool GetAnyFault();
 bool CheckEnterSleep();
 void EnterSleep();
 void EnableLineEventWithPull(ioline_t line, InputPull pull);
+#if PDM_TYPE == 2
+static void I2C2BusRecovery();
+#endif
 
 static InfoMsg StateRunMsg(MsgType::Info, MsgSrc::State_Run);
 static InfoMsg StateSleepMsg(MsgType::Info, MsgSrc::State_Sleep);
@@ -82,7 +85,6 @@ struct PdmThread : chibios_rt::BaseStaticThread<2048>
         {
             CyclicUpdate();
             States();
-            palToggleLine(LINE_E1);
             chThdSleepMilliseconds(2);
         }
     }
@@ -110,9 +112,18 @@ struct SlowThread : chibios_rt::BaseStaticThread<256>
             bDeviceCriticalTemp = IsBoardCritTemp();
 
 #if PDM_TYPE == 2
-            // Read INA3221 current sensors and update Profet current values
-            // 5 sensors × 3 channels = 15 outputs
-            for (uint8_t sensor = 0; sensor < PDM_NUM_INA3221; sensor++)
+            // Read I2CD2 sensors (I2CD2 is active at start of each cycle)
+            for (uint8_t sensor = 0; sensor < PDM_NUM_INA3221_I2CD2; sensor++)
+            {
+                for (uint8_t ch = 1; ch <= 3; ch++)
+                {
+                    uint8_t outIdx = sensor * 3 + (ch - 1);
+                    if (outIdx < PDM_NUM_OUTPUTS)
+                        pf[outIdx].SetExternalCurrent(currentSensor[sensor].GetCurrent(ch));
+                }
+            }
+            // Read I2CD3 sensors
+            for (uint8_t sensor = PDM_NUM_INA3221_I2CD2; sensor < PDM_NUM_INA3221; sensor++)
             {
                 for (uint8_t ch = 1; ch <= 3; ch++)
                 {
@@ -123,13 +134,61 @@ struct SlowThread : chibios_rt::BaseStaticThread<256>
             }
 #endif
 
-            // palToggleLine(LINE_E2);
             chThdSleepMilliseconds(250);
         }
     }
 };
 static SlowThread slowThread;
 static chibios_rt::ThreadReference slowThreadRef;
+
+#if PDM_TYPE == 2
+// Attempt to recover a stuck I2C2 slave holding SDA low.
+// Bit-bangs SCL up to 9 times so any slave mid-byte can finish outputting,
+// then generates a STOP condition to return the bus to idle.
+// Must be called before every i2cStart(&I2CD2, ...).
+// Recover the I2C2 bus by bit-banging SCL 9 times and generating a STOP.
+// Called unconditionally before AND after every i2cStart(&I2CD2):
+//   - Before: clears any slave stuck from a previous incomplete transaction.
+//   - After:  clears any slave confusion caused by the SWRST inside i2c_lld_start,
+//             which on STM32F4 in master mode drives SDA and SCL LOW. When SWRST
+//             is then cleared both lines rise simultaneously (not a clean STOP),
+//             potentially leaving a slave mid-byte and holding SDA low (BUSY=1).
+// Safe to call while I2CD2 has PE=1 (READY, no transaction in flight): pins
+// are temporarily taken from AF to GPIO and returned; the peripheral resumes
+// monitoring with the corrected bus state and BUSY clears once SDA is HIGH.
+static void I2C2BusRecovery()
+{
+    // Take direct control of the pins as open-drain GPIO outputs
+    palSetLineMode(LINE_I2C2_SCL, PAL_MODE_OUTPUT_OPENDRAIN);
+    palSetLineMode(LINE_I2C2_SDA, PAL_MODE_OUTPUT_OPENDRAIN);
+    palSetLine(LINE_I2C2_SCL);
+    palSetLine(LINE_I2C2_SDA);
+    chThdSleepMicroseconds(10);
+
+    // Always clock SCL 9 times: frees any slave stuck mid-byte regardless
+    // of whether SDA currently reads low (it may appear high momentarily
+    // due to the SCL edge that occurred when switching from AF to GPIO).
+    for (uint8_t i = 0; i < 9; i++)
+    {
+        palClearLine(LINE_I2C2_SCL);
+        chThdSleepMicroseconds(5);
+        palSetLine(LINE_I2C2_SCL);
+        chThdSleepMicroseconds(5);
+    }
+
+    // Generate a proper STOP: SDA low -> SCL high -> SDA high
+    palClearLine(LINE_I2C2_SDA);
+    chThdSleepMicroseconds(5);
+    palSetLine(LINE_I2C2_SCL);
+    chThdSleepMicroseconds(5);
+    palSetLine(LINE_I2C2_SDA);
+    chThdSleepMicroseconds(10);
+
+    // Restore pins to AF mode for the I2C2 peripheral
+    palSetLineMode(LINE_I2C2_SCL, PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN);
+    palSetLineMode(LINE_I2C2_SDA, PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN);
+}
+#endif
 
 void InitPdm()
 {
@@ -148,15 +207,41 @@ void InitPdm()
         Error::SetFatalError(FatalErrorType::ErrADC, MsgSrc::Init);
 
 #if PDM_TYPE == 2
-    if (!i2cStart(&I2CD2, &i2cConfig) == HAL_RET_SUCCESS)
+    // I2CD2 and I2CD3 can run simultaneously now that DMA streams are non-conflicting.
+    bool i2cInitOk = true;
+
+    I2C2BusRecovery();
+    if (i2cStart(&I2CD2, &i2cConfig) != HAL_RET_SUCCESS)
         Error::SetFatalError(FatalErrorType::ErrI2C, MsgSrc::Init);
-    if (!i2cStart(&I2CD3, &i2cConfig) == HAL_RET_SUCCESS)
+    I2C2BusRecovery(); // clear any SWRST-induced slave confusion
+
+    if (i2cStart(&I2CD3, &i2cConfig) != HAL_RET_SUCCESS)
         Error::SetFatalError(FatalErrorType::ErrI2C, MsgSrc::Init);
-    for (uint8_t i = 0; i < PDM_NUM_INA3221; i++)
+
+    for (uint8_t i = 0; i < PDM_NUM_INA3221_I2CD2; i++)
     {
         if (!currentSensor[i].Init())
-            Error::SetFatalError(FatalErrorType::ErrI2C, MsgSrc::Init);
+        {
+            i2cInitOk = false;
+            i2cStop(&I2CD2);
+            I2C2BusRecovery();
+            i2cStart(&I2CD2, &i2cConfig);
+            I2C2BusRecovery(); // clear any SWRST-induced slave confusion
+        }
     }
+
+    for (uint8_t i = PDM_NUM_INA3221_I2CD2; i < PDM_NUM_INA3221; i++)
+    {
+        if (!currentSensor[i].Init())
+        {
+            i2cInitOk = false;
+            i2cStop(&I2CD3);
+            i2cStart(&I2CD3, &i2cConfig);
+        }
+    }
+
+    if (!i2cInitOk)
+        Error::SetFatalError(FatalErrorType::ErrI2C, MsgSrc::Init);
 #endif
 
     if(!InitCan(&stConfig.stDevConfig) == HAL_RET_SUCCESS) // Starts CAN threads
@@ -268,8 +353,10 @@ void CyclicUpdate()
     for (uint8_t i = 0; i < PDM_NUM_OUTPUTS; i++)
         pf[i].Update(starter.nVal[i]);
 
+#if PDM_NUM_INPUTS > 0
     for (uint8_t i = 0; i < PDM_NUM_INPUTS; i++)
         in[i].Update();
+#endif
 
     for (uint8_t i = 0; i < PDM_NUM_CAN_INPUTS; i++)
         canIn[i].CheckTimeout();
@@ -393,8 +480,10 @@ void ApplyConfig(MsgCmd eCmd)
 
     if (eCmd == MsgCmd::Inputs)
     {
+#if PDM_NUM_INPUTS > 0
         for (uint8_t i = 0; i < PDM_NUM_INPUTS; i++)
             in[i].SetConfig(&stConfig.stInput[i]);
+#endif
     }
 
     if ((eCmd == MsgCmd::CanInputs) || (eCmd == MsgCmd::CanInputsId))
@@ -610,10 +699,15 @@ bool GetAnyFault()
 
 bool GetInputVal(uint8_t nInput)
 {
+#if PDM_NUM_INPUTS == 0
+    (void)nInput;
+    return false;
+#else
     if (nInput >= PDM_NUM_INPUTS)
         return false;
 
     return in[nInput].nVal;
+#endif
 }
 
 uint16_t GetOutputCurrent(uint8_t nOutput)
@@ -872,4 +966,3 @@ void EnterSleep()
 
     EnterStopMode();
 }
-

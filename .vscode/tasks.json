@@ -30,6 +30,22 @@
             "dependsOn": "clean",
             "problemMatcher": ["$gcc"],
             "detail": "Build firmware"
+        },
+        {
+            "label": "flash",
+            "type": "shell",
+            "command": "openocd",
+            "args": [
+                "-f", "interface/stlink.cfg",
+                "-f", "target/stm32f4x.cfg",
+                "-c", "adapter speed 500",
+                "-c", "init; halt; stm32f4x mass_erase 0; program build/${input:boardType}.elf verify reset exit"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Flash firmware via ST-Link"
         }
     ],
     "inputs": [
@@ -39,7 +55,8 @@
             "description": "Select board type",
             "options": [
                 "dingopdm_v7",
-                "dingopdmmax_v1"
+                "dingopdmmax_v1",
+                "dingoaux"
             ],
             "default": "dingopdm_v7"
         }

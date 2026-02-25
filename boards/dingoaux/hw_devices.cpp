@@ -32,9 +32,9 @@ Digital in[PDM_NUM_INPUTS];
 Led statusLed = Led(LedType::Status);
 Led errorLed = Led(LedType::Error);
 
-// 5x INA3221 current sensors
-// I2C2: addr 0x40, 0x42, 0x43 (sensors 0-2)
-// I2C3: addr 0x42, 0x43       (sensors 3-4)
+// 2x INA3221 current sensors
+// I2C2: addr 0x42, 0x43 (sensors 0-1)
+// I2C3: addr 0x42, 0x43       (sensors 2-3, unused)
 INA3221 currentSensor[PDM_NUM_INA3221] = {
     INA3221(I2CD2, 0x40, INA3221_SHUNT_R),
     INA3221(I2CD2, 0x42, INA3221_SHUNT_R),

@@ -11,7 +11,8 @@ STR R3, [R0, #0]     // Invalidate the magic value
 CMP R2, R1
 BEQ UseDFU
    // bootloader not needed, jump back to normal ChibiOS startup
-   B   _crt0_entry
+   LDR R0, =_crt0_entry
+   BX  R0
 
 UseDFU:
 LDR R0, =0x40023844 // RCC_APB2ENR

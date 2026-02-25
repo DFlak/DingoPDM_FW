@@ -52,9 +52,14 @@ MsgCmdResult Digital::ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxF
     // DLC 4 = Set input settings
     // DLC 2 = Get input settings
 
+#if PDM_NUM_INPUTS == 0
+    (void)conf;
+    (void)tx;
+#endif
     if ((rx->DLC == 4) ||
         (rx->DLC == 2))
     {
+#if PDM_NUM_INPUTS > 0
         uint8_t nIndex = (rx->data8[1] & 0xF0) >> 4;
         if (nIndex < PDM_NUM_INPUTS)
         {
@@ -86,6 +91,7 @@ MsgCmdResult Digital::ProcessSettingsMsg(PdmConfig* conf, CANRxFrame *rx, CANTxF
             else
                 return MsgCmdResult::Request;
         }
+#endif
         return MsgCmdResult::Invalid;
     }
 

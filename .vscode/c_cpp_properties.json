@@ -53,7 +53,7 @@
         },
         {
             "name": "STM32-ChibiOS-Linux",
-            "compilerPath": "/opt/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+            "compilerPath": "/usr/bin/arm-none-eabi-gcc",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-arm",
@@ -99,6 +99,7 @@
                 "${workspaceFolder}/boards/dingopdm_v7",
                 "${workspaceFolder}/boards/dingopdmmax_v1",
                 "${workspaceFolder}/boards/cortex-m4",
+                "${workspaceFolder}/boards/dingoaux",
                 "${workspaceFolder}"
             ]
         }

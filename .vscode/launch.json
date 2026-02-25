@@ -8,14 +8,15 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "configFiles": ["interface/stlink.cfg", 
-						    "target/stm32f4x.cfg"],
+            "configFiles": ["interface/stlink.cfg",
+                            "target/stm32f4x.cfg"],
+            "openOCDLaunchCommands": ["adapter speed 500"],
             "showDevDebugOutput": "raw",
             "svdFile": "${workspaceFolder}/STM32F446.svd",
             "rtos": "auto",
             "v1": false,
             "runToEntryPoint": "main",
-
+            "gdbPath": "/usr/bin/gdb-multiarch"
         },
         {
             "cwd": "${workspaceFolder}",
@@ -24,14 +25,32 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "configFiles": ["interface/stlink.cfg", 
-						    "target/stm32f4x.cfg"],
+            "configFiles": ["interface/stlink.cfg",
+                            "target/stm32f4x.cfg"],
+            "openOCDLaunchCommands": ["adapter speed 500"],
             "showDevDebugOutput": "raw",
             "svdFile": "${workspaceFolder}/STM32F446.svd",
             "rtos": "auto",
             "v1": false,
             "runToEntryPoint": "main",
-
+            "gdbPath": "/usr/bin/gdb-multiarch"
+        },
+        {
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/dingoaux.elf",
+            "name": "Debug dingoAux",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "configFiles": ["interface/stlink.cfg",
+                            "target/stm32f4x.cfg"],
+            "openOCDLaunchCommands": ["adapter speed 500"],
+            "showDevDebugOutput": "raw",
+            "svdFile": "${workspaceFolder}/STM32F446.svd",
+            "rtos": "auto",
+            "v1": false,
+          //  "runToEntryPoint": "main",
+            "gdbPath": "/usr/bin/gdb-multiarch"
         }
     ]
 }

@@ -64,6 +64,7 @@ void SetDefaultConfig()
     stConfig.stDevConfig.bCanFilterEnabled = false;
     stConfig.stDevConfig.bSleepEnabled = true;
 
+#if PDM_NUM_INPUTS > 0
     for(uint8_t i = 0; i < PDM_NUM_INPUTS; i++)
     {
         stConfig.stInput[i].bEnabled = false;
@@ -72,6 +73,7 @@ void SetDefaultConfig()
         stConfig.stInput[i].nDebounceTime = 20;
         stConfig.stInput[i].ePull = InputPull::Up;
     }
+#endif
 
     for(uint8_t i = 0; i < PDM_NUM_VIRT_INPUTS; i++)
     {

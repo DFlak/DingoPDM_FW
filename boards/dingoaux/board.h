@@ -401,14 +401,14 @@
  * PB0  - OUT6                      (output pushpull pulldown).
  * PB1  - OUT7                      (output pushpull pulldown).
  * PB2  - OUT8                      (output pushpull pulldown).
- * PB3  - I2C2_SDA                  (alternate 9, i2c sda, opendrain).
+ * PB3  - I2C2_SDA                  (input floating, switched to AF9 after i2cStart).
  * PB4  - UNUSED                    (input floating).
  * PB5  - UNUSED                    (input floating).
  * PB6  - I2C1_SCL                  (alternate 4, i2c scl).
  * PB7  - I2C1_SDA                  (alternate 4, i2c sda).
  * PB8  - CAN_RX                    (alternate 9, can rx).
  * PB9  - CAN_TX                    (alternate 9, can tx).
- * PB10 - I2C2_SCL                  (alternate 4, i2c scl, opendrain).
+ * PB10 - I2C2_SCL                  (input floating, switched to AF4 after i2cStart).
  * PB11 - UNUSED                    (input floating).
  * PB12 - OUT9                      (output pushpull pulldown).
  * PB13 - OUT10                     (output pushpull pulldown).
@@ -418,14 +418,14 @@
 #define VAL_GPIOB_MODER             (PIN_MODE_OUTPUT(GPIOB_PIN0) |          \
                                      PIN_MODE_OUTPUT(GPIOB_PIN1) |          \
                                      PIN_MODE_OUTPUT(GPIOB_PIN2) |          \
-                                     PIN_MODE_ALTERNATE(GPIOB_PIN3) |       \
+                                     PIN_MODE_ALTERNATE(GPIOB_PIN3) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN4) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN5) |           \
                                      PIN_MODE_ALTERNATE(GPIOB_PIN6) |       \
                                      PIN_MODE_ALTERNATE(GPIOB_PIN7) |       \
                                      PIN_MODE_ALTERNATE(GPIOB_PIN8) |       \
                                      PIN_MODE_ALTERNATE(GPIOB_PIN9) |       \
-                                     PIN_MODE_ALTERNATE(GPIOB_PIN10) |      \
+                                     PIN_MODE_ALTERNATE(GPIOB_PIN10) |          \
                                      PIN_MODE_INPUT(GPIOB_PIN11) |          \
                                      PIN_MODE_OUTPUT(GPIOB_PIN12) |         \
                                      PIN_MODE_OUTPUT(GPIOB_PIN13) |         \
@@ -466,7 +466,7 @@
 #define VAL_GPIOB_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOB_PIN0) |       \
                                      PIN_PUPDR_PULLDOWN(GPIOB_PIN1) |       \
                                      PIN_PUPDR_PULLDOWN(GPIOB_PIN2) |       \
-                                     PIN_PUPDR_FLOATING(GPIOB_PIN3) |       \
+                                     PIN_PUPDR_FLOATING(GPIOB_PIN3) |      \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN4) |       \
                                      PIN_PUPDR_FLOATING(GPIOB_PIN5) |       \
                                      PIN_PUPDR_PULLUP(GPIOB_PIN6) |         \
@@ -482,14 +482,14 @@
 #define VAL_GPIOB_ODR               (PIN_ODR_LOW(GPIOB_PIN0) |              \
                                      PIN_ODR_LOW(GPIOB_PIN1) |              \
                                      PIN_ODR_LOW(GPIOB_PIN2) |              \
-                                     PIN_ODR_LOW(GPIOB_PIN3) |              \
+                                     PIN_ODR_HIGH(GPIOB_PIN3) |              \
                                      PIN_ODR_LOW(GPIOB_PIN4) |              \
                                      PIN_ODR_LOW(GPIOB_PIN5) |              \
                                      PIN_ODR_LOW(GPIOB_PIN6) |              \
                                      PIN_ODR_LOW(GPIOB_PIN7) |              \
                                      PIN_ODR_LOW(GPIOB_PIN8) |              \
                                      PIN_ODR_LOW(GPIOB_PIN9) |              \
-                                     PIN_ODR_LOW(GPIOB_PIN10) |             \
+                                     PIN_ODR_HIGH(GPIOB_PIN10) |             \
                                      PIN_ODR_LOW(GPIOB_PIN11) |             \
                                      PIN_ODR_LOW(GPIOB_PIN12) |             \
                                      PIN_ODR_LOW(GPIOB_PIN13) |             \

@@ -21,6 +21,8 @@
 
 #define PDM_NUM_THERMISTORS 4
 #define PDM_NUM_INA3221 5
+#define PDM_NUM_INA3221_I2CD2 3  // sensors 0-1 on I2CD2
+#define PDM_NUM_INA3221_I2CD3 2  // sensors 3-4 on I2CD3
 
 #define ADC1_NUM_CHANNELS 7
 #define ADC1_BUF_DEPTH 1
@@ -33,6 +35,10 @@
 
 // INA3221 shunt resistance
 #define INA3221_SHUNT_R 0.001f  // 1mOhm
+
+#define BTS7002_1EPP_KILIS 229500
+#define BTS7008_2EPA_KILIS 59500
+#define BTS70012_1ESP_KILIS 350000
 
 #define SLEEP_TIMEOUT 30000
 
@@ -62,8 +68,8 @@ const CANConfig &GetCanConfig(CanBitrate bitrate);
 
 const I2CConfig i2cConfig = {
     OPMODE_I2C,
-    400000,
-    FAST_DUTY_CYCLE_2,
+    100000,
+    STD_DUTY_CYCLE,
 };
 
 msg_t InitAdc();
