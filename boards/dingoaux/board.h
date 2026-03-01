@@ -235,6 +235,10 @@
 #define LINE_OUT8                   PAL_LINE(GPIOD, 12U)
 #define LINE_OUT9                   PAL_LINE(GPIOD, 13U)
 #define LINE_OUT10                  PAL_LINE(GPIOD, 14U)
+#define LINE_DI1                    PAL_LINE(GPIOB, 4U)
+#define LINE_DI2                    PAL_LINE(GPIOB, 5U)
+#define LINE_DI3                    PAL_LINE(GPIOB, 11U)
+#define LINE_DI4                    PAL_LINE(GPIOB, 12U)
 
 
 /*===========================================================================*/

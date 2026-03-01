@@ -28,7 +28,12 @@ Profet pf[PDM_NUM_OUTPUTS] = {
     Profet(15, ProfetModel::SimpleMOSFET, LINE_OUT15, LINE_UNUSED, LINE_UNUSED, AnalogChannel::VRefInt, &PWMD8,  &pwm8Cfg,  PwmChannel::Ch3),
 };
 
-Digital in[PDM_NUM_INPUTS];
+Digital in[PDM_NUM_INPUTS] = {
+    Digital(LINE_DI1),
+    Digital(LINE_DI2),
+    Digital(LINE_DI3),
+    Digital(LINE_DI4)
+};
 
 Led statusLed = Led(LedType::Status);
 Led errorLed = Led(LedType::Error);

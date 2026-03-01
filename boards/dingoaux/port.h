@@ -6,7 +6,7 @@
 #define PDM_TYPE 2 //0 = PDM, 1 = PDM-MAX, 2 = AUX
 
 #define PDM_NUM_OUTPUTS 15
-#define PDM_NUM_INPUTS 0
+#define PDM_NUM_INPUTS 4
 #define PDM_NUM_VIRT_INPUTS 16
 #define PDM_NUM_CAN_INPUTS 32
 #define PDM_NUM_FLASHERS 4
@@ -17,7 +17,7 @@
 
 #define PDM_VAR_MAP_SIZE 134
 
-#define PDM_NUM_TX_MSGS 16
+#define PDM_NUM_TX_MSGS 21
 
 #define PDM_NUM_THERMISTORS 4
 #define PDM_NUM_INA3221 5

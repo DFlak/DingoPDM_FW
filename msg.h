@@ -28,6 +28,13 @@ CANTxMsg TxMsg12();
 CANTxMsg TxMsg13();
 CANTxMsg TxMsg14();
 CANTxMsg TxMsg15();
+#if PDM_NUM_OUTPUTS > 8
+CANTxMsg TxMsg16();
+CANTxMsg TxMsg17();
+CANTxMsg TxMsg18();
+CANTxMsg TxMsg19();
+CANTxMsg TxMsg20();
+#endif
 
 [[maybe_unused]] static CANTxMsg (*TxMsgs[PDM_NUM_TX_MSGS])() = {
     TxMsg0,
@@ -45,7 +52,15 @@ CANTxMsg TxMsg15();
     TxMsg12,
     TxMsg13,
     TxMsg14,
-    TxMsg15};
+    TxMsg15,
+#if PDM_NUM_OUTPUTS > 8
+    TxMsg16,
+    TxMsg17,
+    TxMsg18,
+    TxMsg19,
+    TxMsg20,
+#endif
+};
 
 class InfoMsg
 {

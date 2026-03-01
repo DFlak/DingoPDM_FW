@@ -936,8 +936,22 @@ void EnterSleep()
 
 #if PDM_NUM_INPUTS > 0
     // Digital inputs change detection, with configured pullup or pulldown
-    EnableLineEventWithPull(LINE_DI1, stConfig.stInput[0].ePull);
-    EnableLineEventWithPull(LINE_DI2, stConfig.stInput[1].ePull);
+    const ioline_t diLines[PDM_NUM_INPUTS] = {
+#if PDM_NUM_INPUTS >= 1
+        LINE_DI1,
+#endif
+#if PDM_NUM_INPUTS >= 2
+        LINE_DI2,
+#endif
+#if PDM_NUM_INPUTS >= 3
+        LINE_DI3,
+#endif
+#if PDM_NUM_INPUTS >= 4
+        LINE_DI4,
+#endif
+    };
+    for (uint8_t i = 0; i < PDM_NUM_INPUTS; i++)
+        EnableLineEventWithPull(diLines[i], stConfig.stInput[i].ePull);
 #endif
 
     // CAN receive detection

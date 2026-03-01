@@ -39,7 +39,9 @@ CANTxMsg TxMsg0()
     //=======================================================
     stMsg.frame.SID = stConfig.stCanOutput.nBaseId + 0;
     stMsg.frame.DLC = 8; // Bytes to send
-    stMsg.frame.data8[0] = (GetInputVal(1) << 1) + GetInputVal(0);
+    stMsg.frame.data8[0] = 0;
+    for (uint8_t i = 0; i < PDM_NUM_INPUTS && i < 8; i++)
+        stMsg.frame.data8[0] |= (GetInputVal(i) << i);
     stMsg.frame.data8[1] = static_cast<uint8_t>(GetPdmState()) + (PDM_TYPE << 4);
     stMsg.frame.data16[1] = (uint16_t)GetTotalCurrent(); //Already scaled by 10
     stMsg.frame.data16[2] = (uint16_t)(GetBattVolt() * 10.0);
@@ -323,6 +325,110 @@ CANTxMsg TxMsg14()
 
     return stMsg;
 }
+
+#if PDM_NUM_OUTPUTS > 8
+CANTxMsg TxMsg16()
+{
+    CANTxMsg stMsg;
+    //=======================================================
+    // Build Msg 16 (Out 9-12 Current)
+    //=======================================================
+    stMsg.frame.SID = stConfig.stCanOutput.nBaseId + 16;
+    stMsg.frame.DLC = 8; // Bytes to send
+    stMsg.frame.data16[0] = GetOutputCurrent(8);
+    stMsg.frame.data16[1] = GetOutputCurrent(9);
+    stMsg.frame.data16[2] = GetOutputCurrent(10);
+    stMsg.frame.data16[3] = GetOutputCurrent(11);
+
+    stMsg.bSend = true; // Always send
+
+    return stMsg;
+}
+
+CANTxMsg TxMsg17()
+{
+    CANTxMsg stMsg;
+    //=======================================================
+    // Build Msg 17 (Out 13-15 Current)
+    //=======================================================
+    stMsg.frame.SID = stConfig.stCanOutput.nBaseId + 17;
+    stMsg.frame.DLC = 8; // Bytes to send
+    stMsg.frame.data16[0] = GetOutputCurrent(12);
+    stMsg.frame.data16[1] = GetOutputCurrent(13);
+    stMsg.frame.data16[2] = GetOutputCurrent(14);
+    stMsg.frame.data16[3] = 0; // Padding
+
+    stMsg.bSend = true; // Always send
+
+    return stMsg;
+}
+
+CANTxMsg TxMsg18()
+{
+    CANTxMsg stMsg;
+    //=======================================================
+    // Build Msg 18 (Out 9-15 Status)
+    //=======================================================
+    stMsg.frame.SID = stConfig.stCanOutput.nBaseId + 18;
+    stMsg.frame.DLC = 8; // Bytes to send
+    stMsg.frame.data8[0] = (static_cast<uint8_t>(GetOutputState(9)) << 4) + static_cast<uint8_t>(GetOutputState(8));
+    stMsg.frame.data8[1] = (static_cast<uint8_t>(GetOutputState(11)) << 4) + static_cast<uint8_t>(GetOutputState(10));
+    stMsg.frame.data8[2] = (static_cast<uint8_t>(GetOutputState(13)) << 4) + static_cast<uint8_t>(GetOutputState(12));
+    stMsg.frame.data8[3] = static_cast<uint8_t>(GetOutputState(14));
+    stMsg.frame.data8[4] = 0;
+    stMsg.frame.data8[5] = 0;
+    stMsg.frame.data8[6] = 0;
+    stMsg.frame.data8[7] = 0;
+
+    stMsg.bSend = true; // Always send
+
+    return stMsg;
+}
+
+CANTxMsg TxMsg19()
+{
+    CANTxMsg stMsg;
+    //=======================================================
+    // Build Msg 19 (Out 9-15 Reset Count)
+    //=======================================================
+    stMsg.frame.SID = stConfig.stCanOutput.nBaseId + 19;
+    stMsg.frame.DLC = 8; // Bytes to send
+    stMsg.frame.data8[0] = GetOutputOcCount(8);
+    stMsg.frame.data8[1] = GetOutputOcCount(9);
+    stMsg.frame.data8[2] = GetOutputOcCount(10);
+    stMsg.frame.data8[3] = GetOutputOcCount(11);
+    stMsg.frame.data8[4] = GetOutputOcCount(12);
+    stMsg.frame.data8[5] = GetOutputOcCount(13);
+    stMsg.frame.data8[6] = GetOutputOcCount(14);
+    stMsg.frame.data8[7] = 0; // Padding
+
+    stMsg.bSend = true; // Always send
+
+    return stMsg;
+}
+
+CANTxMsg TxMsg20()
+{
+    CANTxMsg stMsg;
+    //=======================================================
+    // Build Msg 20 (Out 9-15 Duty Cycle)
+    //=======================================================
+    stMsg.frame.SID = stConfig.stCanOutput.nBaseId + 20;
+    stMsg.frame.DLC = 8; // Bytes to send
+    stMsg.frame.data8[0] = GetOutputDC(8);
+    stMsg.frame.data8[1] = GetOutputDC(9);
+    stMsg.frame.data8[2] = GetOutputDC(10);
+    stMsg.frame.data8[3] = GetOutputDC(11);
+    stMsg.frame.data8[4] = GetOutputDC(12);
+    stMsg.frame.data8[5] = GetOutputDC(13);
+    stMsg.frame.data8[6] = GetOutputDC(14);
+    stMsg.frame.data8[7] = 0; // Padding
+
+    stMsg.bSend = true; // Always send
+
+    return stMsg;
+}
+#endif
 
 CANTxMsg TxMsg15()
 {
