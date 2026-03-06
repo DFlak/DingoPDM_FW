@@ -77,6 +77,7 @@ class INA3221
         bool Init();
         bool CheckId();
         bool Configure(const INA3221Config& config);
+        bool VerifyConfig();
 
         // Get current for a channel (1-3) in Profet format (A * 10)
         uint16_t GetCurrent(uint8_t channel);
@@ -92,6 +93,7 @@ class INA3221
         const float m_shuntR; // Shunt resistance in ohms
 
         i2cflags_t lastErrors;
+        uint16_t m_expectedConfig = 0;
 
         bool Read16(uint8_t reg, uint16_t* val);
         bool Write16(uint8_t reg, uint16_t val);

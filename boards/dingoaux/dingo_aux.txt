@@ -1,9 +1,9 @@
 FIRMWARE NOTES:
-- Outputs 8, 9, and 10 were moved to PWM-capable pins.
-  - OUT8: PB2 -> PD12 (TIM4_CH1)
-  - OUT9: PB12 -> PD13 (TIM4_CH2)
-  - OUT10: PB13 -> PD14 (TIM4_CH3)
-- The original pins (PB2, PB12, PB13) are not PWM-capable and cannot be used with the current firmware architecture. This should be corrected in the next PCB revision.
+- Outputs 8, 9, and 10 use original PCB pins (PB2, PB12, PB13).
+  - OUT8: PB2 (GPIO only, no PWM - no timer AF available)
+  - OUT9: PB12 (GPIO only, no PWM - no timer AF available)
+  - OUT10: PB13 (GPIO only, no PWM - no timer AF available)
+- These pins are not PWM-capable on the STM32F446. On/off switching only.
 - Digital inputs are not defined in this revision as per the note below.
 
 ---
@@ -31,9 +31,9 @@ OUT4: PA10
 OUT5: PA15
 OUT6: PB0
 OUT7: PB1
-OUT8: PD12
-OUT9: PD13
-OUT10: PD14
+OUT8: PB2
+OUT9: PB12
+OUT10: PB13
 OUT11: PB14
 OUT12: PB15
 OUT13: PC6
@@ -58,7 +58,10 @@ OUT14 - CH2 INA3221 ON I2C3 ADDR 0x42
 OUT15 - CH1 INA3221 ON I2C3 ADDR 0x42
 
 INPUTS:
-FOR NOW FORGET ABOUT DIGITAL INPUTS, I WIRED THEM WRONG AND THEY WON'T WORK ON THIS REVISION
+DI1: PC2
+DI2: PC3
+DI3: PC4
+DI4: PC5
 
 BATT SENSE: PA3 with a divider to battery with 4.7k and 47k resistors
 

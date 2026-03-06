@@ -34,7 +34,7 @@
 #define THERM_R_PULLUP 10000.0f // Pullup resistor value (10K)
 
 // INA3221 shunt resistance
-#define INA3221_SHUNT_R 0.001f  // 1mOhm
+#define INA3221_SHUNT_R 0.010f  // 10mOhm
 
 #define BTS7002_1EPP_KILIS 229500
 #define BTS7008_2EPA_KILIS 59500

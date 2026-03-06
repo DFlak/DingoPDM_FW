@@ -51,7 +51,18 @@ bool INA3221::Configure(const INA3221Config& config)
     reg |= (static_cast<uint16_t>(config.vsh_ct) << 3);
     reg |= static_cast<uint16_t>(config.mode);
 
+    m_expectedConfig = reg;
+
     return Write16(INA3221_REG_CONFIG, reg);
+}
+
+bool INA3221::VerifyConfig()
+{
+    uint16_t readback = 0;
+    if (!Read16(INA3221_REG_CONFIG, &readback))
+        return false;
+
+    return (readback == m_expectedConfig);
 }
 
 bool INA3221::Init()
@@ -101,5 +112,12 @@ uint16_t INA3221::GetCurrent(uint8_t channel)
     if (currentA < 0.0f)
         currentA = 0.0f;
 
-    return (uint16_t)(currentA * 10.0f);
+    uint16_t result = (uint16_t)(currentA * 10.0f);
+
+    // Deadband: discard readings below 0.5A (value 5 in A*10 format)
+    // Suppresses crosstalk noise from PCB ground/power coupling
+    if (result < 5)
+        result = 0;
+
+    return result;
 }

@@ -217,21 +217,53 @@ void InitPdm()
     if (i2cStart(&I2CD3, &i2cConfig) != HAL_RET_SUCCESS) i2cInitOk = false;
     I2CBusRecovery(LINE_I2C3_SCL, LINE_I2C3_SDA);
 
-    // Initialize all INA3221 sensors in a clean loop
+    // INA3221 current sensor configuration
+    // - All 3 channels enabled (each monitors one output via 1mΩ shunt)
+    // - Shunt-only continuous mode (bus voltage not used, read by MCU ADC)
+    // - 4x averaging with 2116µs shunt conversion time
+    // - Longer conversion time prioritizes per-sample noise rejection over averaging
+    // - Update period: 3ch × 2116µs × 4avg ≈ 25.4ms (~30ms target)
+    // - Resolution: 40µV/LSB / 1mΩ = 0.04A/LSB (meets 0.1A target)
+    // - Full-scale: ±163.8mV / 1mΩ = ±163.8A (safe for short-circuit)
+    static const INA3221Config inaCfg = {
+        true,                               // ch1 enabled
+        true,                               // ch2 enabled
+        true,                               // ch3 enabled
+        INA3221Averaging::AVG_4,             // 4x averaging
+        INA3221ConvTime::CT_2116US,          // bus conv time (unused in shunt-only mode)
+        INA3221ConvTime::CT_2116US,          // shunt conv time
+        INA3221Mode::SHUNT_CONTINUOUS,       // shunt-only continuous
+    };
+
+    // Wait for INA3221 sensors to stabilise after power-on before configuring
+    chThdSleepMilliseconds(1000);
+
+    // Initialize, configure, and verify all INA3221 sensors one by one
     for (uint8_t i = 0; i < PDM_NUM_INA3221; i++)
     {
         I2CDriver* bus = (i < PDM_NUM_INA3221_I2CD2) ? &I2CD2 : &I2CD3;
         ioline_t scl = (i < PDM_NUM_INA3221_I2CD2) ? LINE_I2C2_SCL : LINE_I2C3_SCL;
         ioline_t sda = (i < PDM_NUM_INA3221_I2CD2) ? LINE_I2C2_SDA : LINE_I2C3_SDA;
 
-        if (!currentSensor[i].Init())
+        bool sensorOk = currentSensor[i].Init() &&
+                        currentSensor[i].Configure(inaCfg) &&
+                        currentSensor[i].VerifyConfig();
+
+        if (!sensorOk)
         {
-            i2cInitOk = false;
+            // Recovery: reset bus and retry once
             i2cStop(bus);
             I2CBusRecovery(scl, sda);
             i2cStart(bus, &i2cConfig);
-            I2CBusRecovery(scl, sda); // clear any SWRST-induced slave confusion
+            I2CBusRecovery(scl, sda);
+
+            sensorOk = currentSensor[i].Init() &&
+                       currentSensor[i].Configure(inaCfg) &&
+                       currentSensor[i].VerifyConfig();
         }
+
+        if (!sensorOk)
+            i2cInitOk = false;
     }
 
     if (!i2cInitOk)
